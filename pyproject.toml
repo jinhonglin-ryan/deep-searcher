@@ -5,16 +5,17 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "argparse>=1.4.0",
-    "fastapi>=0.115.9",
-    "firecrawl-py>=2.3.0",
-    "langchain-text-splitters>=0.3.6",
-    "numpy>=2.2.3",
-    "openai>=1.65.1",
-    "pdfplumber>=0.11.5",
-    "pymilvus>=2.5.4",
-    "termcolor>=2.5.0",
+    "fastapi>=0.115.12",
+    "firecrawl-py>=2.5.3",
+    "langchain-text-splitters>=0.3.8",
+    "numpy>=2.2.5",
+    "openai>=1.77.0",
+    "pdfplumber>=0.11.6",
+    "pymilvus>=2.5.8",
+    "requests>=2.32.3",
+    "termcolor>=3.1.0",
     "tqdm>=4.67.1",
-    "uvicorn>=0.34.0",
+    "uvicorn>=0.34.2",
 ]
 description = "None"
 license = { file = "LICENSE"}
@@ -39,40 +40,70 @@ all = [
     "deepsearcher[embedding, llm, file-loader]",
 ]
 embedding = [
-    "boto3>=1.37.5",
+    "boto3>=1.38.11",
+    "fastembed>=0.6.1",
+    "google-generativeai>=0.8.5",
+    "ollama>=0.4.8",
     "voyageai>=0.3.2",
+    "zhipuai>=2.1.5.20250421",
 ]
 llm = [
-    "anthropic>=0.49.0",
-    "google-generativeai>=0.8.4",
-    "ollama>=0.4.7",
-    "together>=1.4.1",
+    "anthropic>=0.51.0",
+    "boto3>=1.38.11",
+    "google-generativeai>=0.8.5",
+    "ollama>=0.4.8",
+    "together>=1.5.7",
+    "zhipuai>=2.1.5.20250421",
 ]
 file-loader = [
-    "unstructured-ingest>=0.5.9",
+    "unstructured-ingest>=1.0.24",
+    "unstructured[all-docs]>=0.17.2",
+]
+vector-db = [
+    "azure-search-documents>=11.5.2",
+    "oracledb>=3.1.0",
+    "qdrant-client>=1.14.2",
 ]
 aws = [
-    "boto3>=1.37.5",
+    "boto3>=1.38.11",
 ]
 voyageai = [
     "voyageai>=0.3.2",
 ]
 anthropic = [
-    "anthropic>=0.49.0",
+    "anthropic>=0.51.0",
 ]
 google = [
-    "google-generativeai>=0.8.4",
+    "google-generativeai>=0.8.5",
 ]
 ollama = [
-    "ollama>=0.4.7",
+    "ollama>=0.4.8",
 ]
 togetherai = [
-    "together>=1.4.1",
+    "together>=1.5.7",
 ]
 unstructured = [
-    "unstructured-ingest>=0.5.9",
+    "unstructured-ingest>=1.0.24",
     "unstructured[all-docs]>=0.17.2",
 ]
+
+fastembed = [
+    "fastembed>=0.6.1",
+]
+zhipuai = [
+    "zhipuai>=2.1.5.20250421",
+]
+qdrant-client = [
+    "qdrant-client>=1.14.2",
+]
+oracledb = [
+    "oracledb>=3.1.0",
+]
+azure-search = [
+    "azure-search-documents>=11.5.2",
+]
+
+
 
 [build-system]
 requires = ["hatchling"]
