@@ -42,7 +42,7 @@ all = [
 embedding = [
     "boto3>=1.38.11",
     "fastembed>=0.6.1",
-    "google-generativeai>=0.8.5",
+    "google-genai>=1.14.0",
     "ollama>=0.4.8",
     "voyageai>=0.3.2",
     "zhipuai>=2.1.5.20250421",
@@ -50,7 +50,7 @@ embedding = [
 llm = [
     "anthropic>=0.51.0",
     "boto3>=1.38.11",
-    "google-generativeai>=0.8.5",
+    "google-genai>=1.14.0",
     "ollama>=0.4.8",
     "together>=1.5.7",
     "zhipuai>=2.1.5.20250421",
@@ -64,9 +64,7 @@ vector-db = [
     "oracledb>=3.1.0",
     "qdrant-client>=1.14.2",
 ]
-aws = [
-    "boto3>=1.38.11",
-]
+
 voyageai = [
     "voyageai>=0.3.2",
 ]
@@ -74,33 +72,37 @@ anthropic = [
     "anthropic>=0.51.0",
 ]
 google = [
-    "google-generativeai>=0.8.5",
+    "google-genai>=1.14.0",
 ]
 ollama = [
     "ollama>=0.4.8",
 ]
-togetherai = [
-    "together>=1.5.7",
-]
+
 unstructured = [
     "unstructured-ingest>=1.0.24",
     "unstructured[all-docs]>=0.17.2",
 ]
 
-fastembed = [
-    "fastembed>=0.6.1",
-]
+
 zhipuai = [
     "zhipuai>=2.1.5.20250421",
 ]
-qdrant-client = [
-    "qdrant-client>=1.14.2",
-]
+
 oracledb = [
     "oracledb>=3.1.0",
 ]
 azure-search = [
     "azure-search-documents>=11.5.2",
+]
+boto3 = [
+    "boto3>=1.38.11",
+]
+together = [
+    "together>=1.5.7",
+]
+qdrant = [
+    "fastembed>=0.6.1",
+    "qdrant-client>=1.14.2",
 ]
 
 

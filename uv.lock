@@ -641,7 +641,7 @@ all = [
     { name = "anthropic" },
     { name = "boto3" },
     { name = "fastembed" },
-    { name = "google-generativeai" },
+    { name = "google-genai" },
     { name = "ollama" },
     { name = "together" },
     { name = "unstructured", extra = ["all-docs"] },
@@ -652,34 +652,31 @@ all = [
 anthropic = [
     { name = "anthropic" },
 ]
-aws = [
-    { name = "boto3" },
-]
 azure-search = [
     { name = "azure-search-documents" },
+]
+boto3 = [
+    { name = "boto3" },
 ]
 embedding = [
     { name = "boto3" },
     { name = "fastembed" },
-    { name = "google-generativeai" },
+    { name = "google-genai" },
     { name = "ollama" },
     { name = "voyageai" },
     { name = "zhipuai" },
-]
-fastembed = [
-    { name = "fastembed" },
 ]
 file-loader = [
     { name = "unstructured", extra = ["all-docs"] },
     { name = "unstructured-ingest" },
 ]
 google = [
-    { name = "google-generativeai" },
+    { name = "google-genai" },
 ]
 llm = [
     { name = "anthropic" },
     { name = "boto3" },
-    { name = "google-generativeai" },
+    { name = "google-genai" },
     { name = "ollama" },
     { name = "together" },
     { name = "zhipuai" },
@@ -690,10 +687,11 @@ ollama = [
 oracledb = [
     { name = "oracledb" },
 ]
-qdrant-client = [
+qdrant = [
+    { name = "fastembed" },
     { name = "qdrant-client" },
 ]
-togetherai = [
+together = [
     { name = "together" },
 ]
 unstructured = [
@@ -724,17 +722,17 @@ requires-dist = [
     { name = "argparse", specifier = ">=1.4.0" },
     { name = "azure-search-documents", marker = "extra == 'azure-search'", specifier = ">=11.5.2" },
     { name = "azure-search-documents", marker = "extra == 'vector-db'", specifier = ">=11.5.2" },
-    { name = "boto3", marker = "extra == 'aws'", specifier = ">=1.38.11" },
+    { name = "boto3", marker = "extra == 'boto3'", specifier = ">=1.38.11" },
     { name = "boto3", marker = "extra == 'embedding'", specifier = ">=1.38.11" },
     { name = "boto3", marker = "extra == 'llm'", specifier = ">=1.38.11" },
     { name = "deepsearcher", extras = ["embedding", "llm", "file-loader"], marker = "extra == 'all'" },
     { name = "fastapi", specifier = ">=0.115.12" },
     { name = "fastembed", marker = "extra == 'embedding'", specifier = ">=0.6.1" },
-    { name = "fastembed", marker = "extra == 'fastembed'", specifier = ">=0.6.1" },
+    { name = "fastembed", marker = "extra == 'qdrant'", specifier = ">=0.6.1" },
     { name = "firecrawl-py", specifier = ">=2.5.3" },
-    { name = "google-generativeai", marker = "extra == 'embedding'", specifier = ">=0.8.5" },
-    { name = "google-generativeai", marker = "extra == 'google'", specifier = ">=0.8.5" },
-    { name = "google-generativeai", marker = "extra == 'llm'", specifier = ">=0.8.5" },
+    { name = "google-genai", marker = "extra == 'embedding'", specifier = ">=1.14.0" },
+    { name = "google-genai", marker = "extra == 'google'", specifier = ">=1.14.0" },
+    { name = "google-genai", marker = "extra == 'llm'", specifier = ">=1.14.0" },
     { name = "langchain-text-splitters", specifier = ">=0.3.8" },
     { name = "numpy", specifier = ">=2.2.5" },
     { name = "ollama", marker = "extra == 'embedding'", specifier = ">=0.4.8" },
@@ -745,12 +743,12 @@ requires-dist = [
     { name = "oracledb", marker = "extra == 'vector-db'", specifier = ">=3.1.0" },
     { name = "pdfplumber", specifier = ">=0.11.6" },
     { name = "pymilvus", specifier = ">=2.5.8" },
-    { name = "qdrant-client", marker = "extra == 'qdrant-client'", specifier = ">=1.14.2" },
+    { name = "qdrant-client", marker = "extra == 'qdrant'", specifier = ">=1.14.2" },
     { name = "qdrant-client", marker = "extra == 'vector-db'", specifier = ">=1.14.2" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "termcolor", specifier = ">=3.1.0" },
     { name = "together", marker = "extra == 'llm'", specifier = ">=1.5.7" },
-    { name = "together", marker = "extra == 'togetherai'", specifier = ">=1.5.7" },
+    { name = "together", marker = "extra == 'together'", specifier = ">=1.5.7" },
     { name = "tqdm", specifier = ">=4.67.1" },
     { name = "unstructured", extras = ["all-docs"], marker = "extra == 'file-loader'", specifier = ">=0.17.2" },
     { name = "unstructured", extras = ["all-docs"], marker = "extra == 'unstructured'", specifier = ">=0.17.2" },
@@ -763,7 +761,7 @@ requires-dist = [
     { name = "zhipuai", marker = "extra == 'llm'", specifier = ">=2.1.5.20250421" },
     { name = "zhipuai", marker = "extra == 'zhipuai'", specifier = ">=2.1.5.20250421" },
 ]
-provides-extras = ["all", "embedding", "llm", "file-loader", "vector-db", "aws", "voyageai", "anthropic", "google", "ollama", "togetherai", "unstructured", "fastembed", "zhipuai", "qdrant-client", "oracledb", "azure-search"]
+provides-extras = ["all", "embedding", "llm", "file-loader", "vector-db", "voyageai", "anthropic", "google", "ollama", "unstructured", "zhipuai", "oracledb", "azure-search", "boto3", "together", "qdrant"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "ruff", specifier = ">=0.9.9" }]
@@ -1065,21 +1063,6 @@ wheels = [
 ]
 
 [[package]]
-name = "google-ai-generativelanguage"
-version = "0.6.15"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "google-api-core", extra = ["grpc"] },
-    { name = "google-auth" },
-    { name = "proto-plus" },
-    { name = "protobuf" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/11/d1/48fe5d7a43d278e9f6b5ada810b0a3530bbeac7ed7fcbcd366f932f05316/google_ai_generativelanguage-0.6.15.tar.gz", hash = "sha256:8f6d9dc4c12b065fe2d0289026171acea5183ebf2d0b11cefe12f3821e159ec3", size = 1375443 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/7c/a3/67b8a6ff5001a1d8864922f2d6488dc2a14367ceb651bc3f09a947f2f306/google_ai_generativelanguage-0.6.15-py3-none-any.whl", hash = "sha256:5a03ef86377aa184ffef3662ca28f19eeee158733e45d7947982eb953c6ebb6c", size = 1327356 },
-]
-
-[[package]]
 name = "google-api-core"
 version = "2.24.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1102,22 +1085,6 @@ grpc = [
 ]
 
 [[package]]
-name = "google-api-python-client"
-version = "2.169.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "google-api-core" },
-    { name = "google-auth" },
-    { name = "google-auth-httplib2" },
-    { name = "httplib2" },
-    { name = "uritemplate" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/4f/e6/787c24738fc7c99de9289abe60bd64591800ae1cdf60db7b87e0e6ef9cdd/google_api_python_client-2.169.0.tar.gz", hash = "sha256:0585bb97bd5f5bf3ed8d4bf624593e4c5a14d06c811d1952b07a1f94b4d12c51", size = 12811341 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2d/bd/6aa93c38756cc9fc63262e0dc3d3f1ff7241ce6f413a25ad6e4a9c98b473/google_api_python_client-2.169.0-py3-none-any.whl", hash = "sha256:dae3e882dc0e6f28e60cf09c1f13fedfd881db84f824dd418aa9e44def2fe00d", size = 13323742 },
-]
-
-[[package]]
 name = "google-auth"
 version = "2.40.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1129,19 +1096,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/94/a5/38c21d0e731bb716cffcf987bd9a3555cb95877ab4b616cfb96939933f20/google_auth-2.40.1.tar.gz", hash = "sha256:58f0e8416a9814c1d86c9b7f6acf6816b51aba167b2c76821965271bac275540", size = 280975 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a1/b1/1272c6e80847ba5349f5ccb7574596393d1e222543f5003cb810865c3575/google_auth-2.40.1-py2.py3-none-any.whl", hash = "sha256:ed4cae4f5c46b41bae1d19c036e06f6c371926e97b19e816fc854eff811974ee", size = 216101 },
-]
-
-[[package]]
-name = "google-auth-httplib2"
-version = "0.2.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "google-auth" },
-    { name = "httplib2" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/56/be/217a598a818567b28e859ff087f347475c807a5649296fb5a817c58dacef/google-auth-httplib2-0.2.0.tar.gz", hash = "sha256:38aa7badf48f974f1eb9861794e9c0cb2a0511a4ec0679b1f886d108f5640e05", size = 10842 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/be/8a/fe34d2f3f9470a27b01c9e76226965863f153d5fbe276f83608562e49c04/google_auth_httplib2-0.2.0-py2.py3-none-any.whl", hash = "sha256:b65a0a2123300dd71281a7bf6e64d65a0759287df52729bdd1ae2e47dc311a3d", size = 9253 },
 ]
 
 [[package]]
@@ -1160,21 +1114,21 @@ wheels = [
 ]
 
 [[package]]
-name = "google-generativeai"
-version = "0.8.5"
+name = "google-genai"
+version = "1.14.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "google-ai-generativelanguage" },
-    { name = "google-api-core" },
-    { name = "google-api-python-client" },
+    { name = "anyio" },
     { name = "google-auth" },
-    { name = "protobuf" },
+    { name = "httpx" },
     { name = "pydantic" },
-    { name = "tqdm" },
+    { name = "requests" },
     { name = "typing-extensions" },
+    { name = "websockets" },
 ]
+sdist = { url = "https://files.pythonhosted.org/packages/00/ba/c8e4c0b60c6dda40e51e2125709d097c2609fce1389b4a05f40cdd51c1ec/google_genai-1.14.0.tar.gz", hash = "sha256:7c608de5bb173486a546f5ec4562255c26bae72d33d758a3207bb26f695d0087", size = 169938 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6e/40/c42ff9ded9f09ec9392879a8e6538a00b2dc185e834a3392917626255419/google_generativeai-0.8.5-py3-none-any.whl", hash = "sha256:22b420817fb263f8ed520b33285f45976d5b21e904da32b80d4fd20c055123a2", size = 155427 },
+    { url = "https://files.pythonhosted.org/packages/12/86/dde4cd028c8b0716b3f1f6d202647396a87a4ecbbdc7e4beb59b9d9284d3/google_genai-1.14.0-py3-none-any.whl", hash = "sha256:5916ee985bf69ac7b68c4488949225db71e21579afc7ba5ecd5321173b60d3b2", size = 168862 },
 ]
 
 [[package]]
@@ -1317,18 +1271,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/06/94/82699a10bca87a5556c9c59b5963f2d039dbd239f25bc2a63907a05a14cb/httpcore-1.0.9.tar.gz", hash = "sha256:6e34463af53fd2ab5d807f399a9b45ea31c3dfa2276f15a2c3f00afff6e176e8", size = 85484 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl", hash = "sha256:2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55", size = 78784 },
-]
-
-[[package]]
-name = "httplib2"
-version = "0.22.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pyparsing" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/3d/ad/2371116b22d616c194aa25ec410c9c6c37f23599dcd590502b74db197584/httplib2-0.22.0.tar.gz", hash = "sha256:d7a10bc5ef5ab08322488bde8c726eeee5c8618723fdb399597ec58f3d82df81", size = 351116 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a8/6c/d2fbdaaa5959339d53ba38e94c123e4e84b8fbc4b84beb0e70d7c1608486/httplib2-0.22.0-py3-none-any.whl", hash = "sha256:14ae0a53c1ba8f3d37e9e27cf37eabb0fb9980f435ba405d546948b009dd64dc", size = 96854 },
 ]
 
 [[package]]
@@ -4428,15 +4370,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ef/b1/4b3a976b76549f22c3f5493a622603617cbe08804402978e1dac9c387997/unstructured.pytesseract-0.3.15.tar.gz", hash = "sha256:4b81bc76cfff4e2ef37b04863f0e48bd66184c0b39c3b2b4e017483bca1a7394", size = 15703 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/10/6d/adb955ecf60811a3735d508974bbb5358e7745b635dc001329267529c6f2/unstructured.pytesseract-0.3.15-py3-none-any.whl", hash = "sha256:a3f505c5efb7ff9f10379051a7dd6aa624b3be6b0f023ed6767cc80d0b1613d1", size = 14992 },
-]
-
-[[package]]
-name = "uritemplate"
-version = "4.1.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/d2/5a/4742fdba39cd02a56226815abfa72fe0aa81c33bed16ed045647d6000eba/uritemplate-4.1.1.tar.gz", hash = "sha256:4346edfc5c3b79f694bccd6d6099a322bbeb628dbf2cd86eea55a456ce5124f0", size = 273898 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/81/c0/7461b49cd25aeece13766f02ee576d1db528f1c37ce69aee300e075b485b/uritemplate-4.1.1-py2.py3-none-any.whl", hash = "sha256:830c08b8d99bdd312ea4ead05994a38e8936266f84b9a7878232db50b044e02e", size = 10356 },
 ]
 
 [[package]]
