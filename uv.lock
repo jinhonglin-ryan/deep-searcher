@@ -809,6 +809,9 @@ azure-search = [
 boto3 = [
     { name = "boto3" },
 ]
+crawl4ai = [
+    { name = "crawl4ai" },
+]
 docling = [
     { name = "docling", version = "2.15.1", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
     { name = "docling", version = "2.31.0", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
@@ -890,6 +893,7 @@ requires-dist = [
     { name = "boto3", marker = "extra == 'boto3'", specifier = ">=1.38.11" },
     { name = "boto3", marker = "extra == 'embedding'", specifier = ">=1.38.11" },
     { name = "boto3", marker = "extra == 'llm'", specifier = ">=1.38.11" },
+    { name = "crawl4ai", marker = "extra == 'crawl4ai'", specifier = ">=0.6.2" },
     { name = "crawl4ai", marker = "extra == 'web-crawler'", specifier = ">=0.6.2" },
     { name = "deepsearcher", extras = ["embedding", "llm", "file-loader"], marker = "extra == 'all'" },
     { name = "docling", marker = "extra == 'docling'", specifier = ">=2.15.1" },
@@ -933,7 +937,7 @@ requires-dist = [
     { name = "zhipuai", marker = "extra == 'llm'", specifier = ">=2.1.5.20250421" },
     { name = "zhipuai", marker = "extra == 'zhipuai'", specifier = ">=2.1.5.20250421" },
 ]
-provides-extras = ["all", "embedding", "llm", "file-loader", "web-crawler", "vector-db", "voyageai", "anthropic", "google", "ollama", "unstructured", "zhipuai", "oracledb", "azure-search", "boto3", "together", "qdrant", "docling"]
+provides-extras = ["all", "embedding", "llm", "file-loader", "web-crawler", "vector-db", "voyageai", "anthropic", "google", "ollama", "unstructured", "zhipuai", "oracledb", "azure-search", "boto3", "together", "qdrant", "docling", "crawl4ai"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "ruff", specifier = ">=0.9.9" }]
