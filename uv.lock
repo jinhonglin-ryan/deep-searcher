@@ -787,13 +787,17 @@ dependencies = [
 [package.optional-dependencies]
 all = [
     { name = "anthropic" },
+    { name = "azure-search-documents" },
     { name = "boto3" },
+    { name = "crawl4ai" },
     { name = "docling", version = "2.15.1", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
     { name = "docling", version = "2.31.0", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
     { name = "docling-core" },
     { name = "fastembed" },
     { name = "google-genai" },
     { name = "ollama" },
+    { name = "oracledb" },
+    { name = "qdrant-client" },
     { name = "together" },
     { name = "unstructured", extra = ["all-docs"] },
     { name = "unstructured-ingest" },
@@ -817,31 +821,8 @@ docling = [
     { name = "docling", version = "2.31.0", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
     { name = "docling-core" },
 ]
-embedding = [
-    { name = "boto3" },
-    { name = "fastembed" },
-    { name = "google-genai" },
-    { name = "ollama" },
-    { name = "voyageai" },
-    { name = "zhipuai" },
-]
-file-loader = [
-    { name = "docling", version = "2.15.1", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
-    { name = "docling", version = "2.31.0", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
-    { name = "docling-core" },
-    { name = "unstructured", extra = ["all-docs"] },
-    { name = "unstructured-ingest" },
-]
 google = [
     { name = "google-genai" },
-]
-llm = [
-    { name = "anthropic" },
-    { name = "boto3" },
-    { name = "google-genai" },
-    { name = "ollama" },
-    { name = "together" },
-    { name = "zhipuai" },
 ]
 ollama = [
     { name = "ollama" },
@@ -860,19 +841,8 @@ unstructured = [
     { name = "unstructured", extra = ["all-docs"] },
     { name = "unstructured-ingest" },
 ]
-vector-db = [
-    { name = "azure-search-documents" },
-    { name = "oracledb" },
-    { name = "qdrant-client" },
-]
 voyageai = [
     { name = "voyageai" },
-]
-web-crawler = [
-    { name = "crawl4ai" },
-    { name = "docling", version = "2.15.1", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
-    { name = "docling", version = "2.31.0", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
-    { name = "docling-core" },
 ]
 zhipuai = [
     { name = "zhipuai" },
@@ -885,59 +855,52 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "anthropic", marker = "extra == 'all'", specifier = ">=0.51.0" },
     { name = "anthropic", marker = "extra == 'anthropic'", specifier = ">=0.51.0" },
-    { name = "anthropic", marker = "extra == 'llm'", specifier = ">=0.51.0" },
     { name = "argparse", specifier = ">=1.4.0" },
+    { name = "azure-search-documents", marker = "extra == 'all'", specifier = ">=11.5.2" },
     { name = "azure-search-documents", marker = "extra == 'azure-search'", specifier = ">=11.5.2" },
-    { name = "azure-search-documents", marker = "extra == 'vector-db'", specifier = ">=11.5.2" },
+    { name = "boto3", marker = "extra == 'all'", specifier = ">=1.38.11" },
     { name = "boto3", marker = "extra == 'boto3'", specifier = ">=1.38.11" },
-    { name = "boto3", marker = "extra == 'embedding'", specifier = ">=1.38.11" },
-    { name = "boto3", marker = "extra == 'llm'", specifier = ">=1.38.11" },
+    { name = "crawl4ai", marker = "extra == 'all'", specifier = ">=0.6.2" },
     { name = "crawl4ai", marker = "extra == 'crawl4ai'", specifier = ">=0.6.2" },
-    { name = "crawl4ai", marker = "extra == 'web-crawler'", specifier = ">=0.6.2" },
-    { name = "deepsearcher", extras = ["embedding", "llm", "file-loader"], marker = "extra == 'all'" },
+    { name = "docling", marker = "extra == 'all'", specifier = ">=2.15.1" },
     { name = "docling", marker = "extra == 'docling'", specifier = ">=2.15.1" },
-    { name = "docling", marker = "extra == 'file-loader'", specifier = ">=2.15.1" },
-    { name = "docling", marker = "extra == 'web-crawler'", specifier = ">=2.15.1" },
+    { name = "docling-core", marker = "extra == 'all'", specifier = ">=2.30.0" },
     { name = "docling-core", marker = "extra == 'docling'", specifier = ">=2.30.0" },
-    { name = "docling-core", marker = "extra == 'file-loader'", specifier = ">=2.30.0" },
-    { name = "docling-core", marker = "extra == 'web-crawler'", specifier = ">=2.30.0" },
     { name = "fastapi", specifier = ">=0.115.12" },
-    { name = "fastembed", marker = "extra == 'embedding'", specifier = ">=0.6.1" },
+    { name = "fastembed", marker = "extra == 'all'", specifier = ">=0.6.1" },
     { name = "fastembed", marker = "extra == 'qdrant'", specifier = ">=0.6.1" },
     { name = "firecrawl-py", specifier = ">=2.5.3" },
-    { name = "google-genai", marker = "extra == 'embedding'", specifier = ">=1.14.0" },
+    { name = "google-genai", marker = "extra == 'all'", specifier = ">=1.14.0" },
     { name = "google-genai", marker = "extra == 'google'", specifier = ">=1.14.0" },
-    { name = "google-genai", marker = "extra == 'llm'", specifier = ">=1.14.0" },
     { name = "langchain-text-splitters", specifier = ">=0.3.8" },
     { name = "numpy", specifier = ">=1.26.4" },
-    { name = "ollama", marker = "extra == 'embedding'", specifier = ">=0.4.8" },
-    { name = "ollama", marker = "extra == 'llm'", specifier = ">=0.4.8" },
+    { name = "ollama", marker = "extra == 'all'", specifier = ">=0.4.8" },
     { name = "ollama", marker = "extra == 'ollama'", specifier = ">=0.4.8" },
     { name = "openai", specifier = ">=1.77.0" },
+    { name = "oracledb", marker = "extra == 'all'", specifier = ">=3.1.0" },
     { name = "oracledb", marker = "extra == 'oracledb'", specifier = ">=3.1.0" },
-    { name = "oracledb", marker = "extra == 'vector-db'", specifier = ">=3.1.0" },
     { name = "pdfplumber", specifier = ">=0.11.6" },
     { name = "pymilvus", specifier = ">=2.5.8" },
+    { name = "qdrant-client", marker = "extra == 'all'", specifier = ">=1.14.2" },
     { name = "qdrant-client", marker = "extra == 'qdrant'", specifier = ">=1.14.2" },
-    { name = "qdrant-client", marker = "extra == 'vector-db'", specifier = ">=1.14.2" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "termcolor", specifier = ">=3.1.0" },
-    { name = "together", marker = "extra == 'llm'", specifier = ">=1.3.14" },
+    { name = "together", marker = "extra == 'all'", specifier = ">=1.3.14" },
     { name = "together", marker = "extra == 'together'", specifier = ">=1.3.14" },
     { name = "tqdm", specifier = ">=4.67.1" },
-    { name = "unstructured", extras = ["all-docs"], marker = "extra == 'file-loader'", specifier = ">=0.17.2" },
+    { name = "unstructured", extras = ["all-docs"], marker = "extra == 'all'", specifier = ">=0.17.2" },
     { name = "unstructured", extras = ["all-docs"], marker = "extra == 'unstructured'", specifier = ">=0.17.2" },
-    { name = "unstructured-ingest", marker = "extra == 'file-loader'", specifier = ">=1.0.24" },
+    { name = "unstructured-ingest", marker = "extra == 'all'", specifier = ">=1.0.24" },
     { name = "unstructured-ingest", marker = "extra == 'unstructured'", specifier = ">=1.0.24" },
     { name = "uvicorn", specifier = ">=0.34.2" },
-    { name = "voyageai", marker = "extra == 'embedding'", specifier = ">=0.3.2" },
+    { name = "voyageai", marker = "extra == 'all'", specifier = ">=0.3.2" },
     { name = "voyageai", marker = "extra == 'voyageai'", specifier = ">=0.3.2" },
-    { name = "zhipuai", marker = "extra == 'embedding'", specifier = ">=2.1.5.20250421" },
-    { name = "zhipuai", marker = "extra == 'llm'", specifier = ">=2.1.5.20250421" },
+    { name = "zhipuai", marker = "extra == 'all'", specifier = ">=2.1.5.20250421" },
     { name = "zhipuai", marker = "extra == 'zhipuai'", specifier = ">=2.1.5.20250421" },
 ]
-provides-extras = ["all", "embedding", "llm", "file-loader", "web-crawler", "vector-db", "voyageai", "anthropic", "google", "ollama", "unstructured", "zhipuai", "oracledb", "azure-search", "boto3", "together", "qdrant", "docling", "crawl4ai"]
+provides-extras = ["all", "voyageai", "anthropic", "google", "ollama", "unstructured", "zhipuai", "oracledb", "azure-search", "boto3", "together", "qdrant", "docling", "crawl4ai"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "ruff", specifier = ">=0.9.9" }]
@@ -1005,7 +968,7 @@ dependencies = [
     { name = "requests", marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
     { name = "rtree", marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
     { name = "scipy", marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
-    { name = "typer", version = "0.12.5", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
+    { name = "typer", marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/98/81/a87094510c9d55171488dddaae7102b40ef3c95b0403d6906de055799e8d/docling-2.15.1.tar.gz", hash = "sha256:578b4eb3c9833e95025aaa4174c0f3a1b9037c81a75fc616e49c16afbd217abf", size = 87966, upload-time = "2025-01-10T10:30:27.416Z" }
 wheels = [
@@ -1058,7 +1021,7 @@ dependencies = [
     { name = "rtree", marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
     { name = "scipy", marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
     { name = "tqdm", marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
-    { name = "typer", version = "0.15.3", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
+    { name = "typer", marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ac/1d/6bdb18320e16eb347a158f45a825bf14584714da0b3af4fe8165e78a1ebb/docling-2.31.0.tar.gz", hash = "sha256:1115f4cda7e67c70a6a61395aed65133f4e85e86914bdae5153c10a5ed329a71", size = 128741, upload-time = "2025-04-25T08:30:34.455Z" }
 wheels = [
@@ -1078,8 +1041,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "pyyaml" },
     { name = "tabulate" },
-    { name = "typer", version = "0.12.5", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
-    { name = "typer", version = "0.15.3", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
+    { name = "typer" },
     { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/72/37/e0a7e68910d2f73613a2d6f5fc735d672a231ba855b689e695a3db421651/docling_core-2.30.0.tar.gz", hash = "sha256:5f064f80584803ae1e7b2818d6977ef2df7cd2e20168c7065443b07cc9de435f", size = 112461, upload-time = "2025-05-06T12:24:08.372Z" }
@@ -1732,16 +1694,16 @@ wheels = [
 
 [[package]]
 name = "grpcio-status"
-version = "1.67.1"
+version = "1.62.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "googleapis-common-protos" },
     { name = "grpcio" },
     { name = "protobuf" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/be/c7/fe0e79a80ac6346e0c6c0a24e9e3cbc3ae1c2a009acffb59eab484a6f69b/grpcio_status-1.67.1.tar.gz", hash = "sha256:2bf38395e028ceeecfd8866b081f61628114b384da7d51ae064ddc8d766a5d11", size = 13673, upload-time = "2024-10-29T06:30:21.787Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/7c/d7/013ef01c5a1c2fd0932c27c904934162f69f41ca0f28396d3ffe4d386123/grpcio-status-1.62.3.tar.gz", hash = "sha256:289bdd7b2459794a12cf95dc0cb727bd4a1742c37bd823f760236c937e53a485", size = 13063, upload-time = "2024-08-06T00:37:08.003Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/05/18/56999a1da3577d8ccc8698a575d6638e15fe25650cc88b2ce0a087f180b9/grpcio_status-1.67.1-py3-none-any.whl", hash = "sha256:16e6c085950bdacac97c779e6a502ea671232385e6e37f258884d6883392c2bd", size = 14427, upload-time = "2024-10-29T06:27:38.228Z" },
+    { url = "https://files.pythonhosted.org/packages/90/40/972271de05f9315c0d69f9f7ebbcadd83bc85322f538637d11bb8c67803d/grpcio_status-1.62.3-py3-none-any.whl", hash = "sha256:f9049b762ba8de6b1086789d8315846e094edac2c50beaf462338b301a8fd4b8", size = 14448, upload-time = "2024-08-06T00:30:15.702Z" },
 ]
 
 [[package]]
@@ -3707,16 +3669,16 @@ wheels = [
 
 [[package]]
 name = "protobuf"
-version = "5.29.4"
+version = "6.30.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/17/7d/b9dca7365f0e2c4fa7c193ff795427cfa6290147e5185ab11ece280a18e7/protobuf-5.29.4.tar.gz", hash = "sha256:4f1dfcd7997b31ef8f53ec82781ff434a28bf71d9102ddde14d076adcfc78c99", size = 424902, upload-time = "2025-03-19T21:23:24.25Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c8/8c/cf2ac658216eebe49eaedf1e06bc06cbf6a143469236294a1171a51357c3/protobuf-6.30.2.tar.gz", hash = "sha256:35c859ae076d8c56054c25b59e5e59638d86545ed6e2b6efac6be0b6ea3ba048", size = 429315, upload-time = "2025-03-26T19:12:57.394Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9a/b2/043a1a1a20edd134563699b0e91862726a0dc9146c090743b6c44d798e75/protobuf-5.29.4-cp310-abi3-win32.whl", hash = "sha256:13eb236f8eb9ec34e63fc8b1d6efd2777d062fa6aaa68268fb67cf77f6839ad7", size = 422709, upload-time = "2025-03-19T21:23:08.293Z" },
-    { url = "https://files.pythonhosted.org/packages/79/fc/2474b59570daa818de6124c0a15741ee3e5d6302e9d6ce0bdfd12e98119f/protobuf-5.29.4-cp310-abi3-win_amd64.whl", hash = "sha256:bcefcdf3976233f8a502d265eb65ea740c989bacc6c30a58290ed0e519eb4b8d", size = 434506, upload-time = "2025-03-19T21:23:11.253Z" },
-    { url = "https://files.pythonhosted.org/packages/46/de/7c126bbb06aa0f8a7b38aaf8bd746c514d70e6a2a3f6dd460b3b7aad7aae/protobuf-5.29.4-cp38-abi3-macosx_10_9_universal2.whl", hash = "sha256:307ecba1d852ec237e9ba668e087326a67564ef83e45a0189a772ede9e854dd0", size = 417826, upload-time = "2025-03-19T21:23:13.132Z" },
-    { url = "https://files.pythonhosted.org/packages/a2/b5/bade14ae31ba871a139aa45e7a8183d869efe87c34a4850c87b936963261/protobuf-5.29.4-cp38-abi3-manylinux2014_aarch64.whl", hash = "sha256:aec4962f9ea93c431d5714ed1be1c93f13e1a8618e70035ba2b0564d9e633f2e", size = 319574, upload-time = "2025-03-19T21:23:14.531Z" },
-    { url = "https://files.pythonhosted.org/packages/46/88/b01ed2291aae68b708f7d334288ad5fb3e7aa769a9c309c91a0d55cb91b0/protobuf-5.29.4-cp38-abi3-manylinux2014_x86_64.whl", hash = "sha256:d7d3f7d1d5a66ed4942d4fefb12ac4b14a29028b209d4bfb25c68ae172059922", size = 319672, upload-time = "2025-03-19T21:23:15.839Z" },
-    { url = "https://files.pythonhosted.org/packages/12/fb/a586e0c973c95502e054ac5f81f88394f24ccc7982dac19c515acd9e2c93/protobuf-5.29.4-py3-none-any.whl", hash = "sha256:3fde11b505e1597f71b875ef2fc52062b6a9740e5f7c8997ce878b6009145862", size = 172551, upload-time = "2025-03-19T21:23:22.682Z" },
+    { url = "https://files.pythonhosted.org/packages/be/85/cd53abe6a6cbf2e0029243d6ae5fb4335da2996f6c177bb2ce685068e43d/protobuf-6.30.2-cp310-abi3-win32.whl", hash = "sha256:b12ef7df7b9329886e66404bef5e9ce6a26b54069d7f7436a0853ccdeb91c103", size = 419148, upload-time = "2025-03-26T19:12:41.359Z" },
+    { url = "https://files.pythonhosted.org/packages/97/e9/7b9f1b259d509aef2b833c29a1f3c39185e2bf21c9c1be1cd11c22cb2149/protobuf-6.30.2-cp310-abi3-win_amd64.whl", hash = "sha256:7653c99774f73fe6b9301b87da52af0e69783a2e371e8b599b3e9cb4da4b12b9", size = 431003, upload-time = "2025-03-26T19:12:44.156Z" },
+    { url = "https://files.pythonhosted.org/packages/8e/66/7f3b121f59097c93267e7f497f10e52ced7161b38295137a12a266b6c149/protobuf-6.30.2-cp39-abi3-macosx_10_9_universal2.whl", hash = "sha256:0eb523c550a66a09a0c20f86dd554afbf4d32b02af34ae53d93268c1f73bc65b", size = 417579, upload-time = "2025-03-26T19:12:45.447Z" },
+    { url = "https://files.pythonhosted.org/packages/d0/89/bbb1bff09600e662ad5b384420ad92de61cab2ed0f12ace1fd081fd4c295/protobuf-6.30.2-cp39-abi3-manylinux2014_aarch64.whl", hash = "sha256:50f32cc9fd9cb09c783ebc275611b4f19dfdfb68d1ee55d2f0c7fa040df96815", size = 317319, upload-time = "2025-03-26T19:12:46.999Z" },
+    { url = "https://files.pythonhosted.org/packages/28/50/1925de813499546bc8ab3ae857e3ec84efe7d2f19b34529d0c7c3d02d11d/protobuf-6.30.2-cp39-abi3-manylinux2014_x86_64.whl", hash = "sha256:4f6c687ae8efae6cf6093389a596548214467778146b7245e886f35e1485315d", size = 316212, upload-time = "2025-03-26T19:12:48.458Z" },
+    { url = "https://files.pythonhosted.org/packages/e5/a1/93c2acf4ade3c5b557d02d500b06798f4ed2c176fa03e3c34973ca92df7f/protobuf-6.30.2-py3-none-any.whl", hash = "sha256:ae86b030e69a98e08c77beab574cbcb9fff6d031d57209f574a5aea1445f4b51", size = 167062, upload-time = "2025-03-26T19:12:55.892Z" },
 ]
 
 [[package]]
@@ -5202,8 +5164,7 @@ dependencies = [
     { name = "rich" },
     { name = "tabulate" },
     { name = "tqdm" },
-    { name = "typer", version = "0.12.5", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
-    { name = "typer", version = "0.15.3", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
+    { name = "typer" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b3/ea/a6bea1e3b4233924aac740e9963631334ed1134e7375ed1e4ed5d997d3e7/together-1.3.14.tar.gz", hash = "sha256:9ce173fd11253dfa1a34dfcd48f77be7ed82ac643b07d96157f0f65356b9c76d", size = 52400, upload-time = "2025-01-27T23:40:51.342Z" }
 wheels = [
@@ -5370,54 +5331,15 @@ wheels = [
 name = "typer"
 version = "0.12.5"
 source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform == 'darwin'",
-    "python_full_version >= '3.12.4' and python_full_version < '3.13' and platform_machine == 'x86_64' and sys_platform == 'darwin'",
-    "python_full_version >= '3.12' and python_full_version < '3.12.4' and platform_machine == 'x86_64' and sys_platform == 'darwin'",
-    "python_full_version == '3.11.*' and platform_machine == 'x86_64' and sys_platform == 'darwin'",
-    "python_full_version < '3.11' and platform_machine == 'x86_64' and sys_platform == 'darwin'",
-]
 dependencies = [
-    { name = "click", marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
-    { name = "rich", marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
-    { name = "shellingham", marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
-    { name = "typing-extensions", marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
+    { name = "click" },
+    { name = "rich" },
+    { name = "shellingham" },
+    { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c5/58/a79003b91ac2c6890fc5d90145c662fd5771c6f11447f116b63300436bc9/typer-0.12.5.tar.gz", hash = "sha256:f592f089bedcc8ec1b974125d64851029c3b1af145f04aca64d69410f0c9b722", size = 98953, upload-time = "2024-08-24T21:17:57.346Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a8/2b/886d13e742e514f704c33c4caa7df0f3b89e5a25ef8db02aa9ca3d9535d5/typer-0.12.5-py3-none-any.whl", hash = "sha256:62fe4e471711b147e3365034133904df3e235698399bc4de2b36c8579298d52b", size = 47288, upload-time = "2024-08-24T21:17:55.451Z" },
-]
-
-[[package]]
-name = "typer"
-version = "0.15.3"
-source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.13' and platform_machine != 'x86_64' and sys_platform == 'darwin'",
-    "python_full_version >= '3.13' and platform_machine == 'aarch64' and sys_platform == 'linux'",
-    "(python_full_version >= '3.13' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version >= '3.13' and sys_platform != 'darwin' and sys_platform != 'linux')",
-    "python_full_version >= '3.12.4' and python_full_version < '3.13' and platform_machine != 'x86_64' and sys_platform == 'darwin'",
-    "python_full_version >= '3.12.4' and python_full_version < '3.13' and platform_machine == 'aarch64' and sys_platform == 'linux'",
-    "(python_full_version >= '3.12.4' and python_full_version < '3.13' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version >= '3.12.4' and python_full_version < '3.13' and sys_platform != 'darwin' and sys_platform != 'linux')",
-    "python_full_version >= '3.12' and python_full_version < '3.12.4' and platform_machine != 'x86_64' and sys_platform == 'darwin'",
-    "python_full_version >= '3.12' and python_full_version < '3.12.4' and platform_machine == 'aarch64' and sys_platform == 'linux'",
-    "(python_full_version >= '3.12' and python_full_version < '3.12.4' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version >= '3.12' and python_full_version < '3.12.4' and sys_platform != 'darwin' and sys_platform != 'linux')",
-    "python_full_version == '3.11.*' and platform_machine != 'x86_64' and sys_platform == 'darwin'",
-    "python_full_version == '3.11.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
-    "(python_full_version == '3.11.*' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.11.*' and sys_platform != 'darwin' and sys_platform != 'linux')",
-    "python_full_version < '3.11' and platform_machine != 'x86_64' and sys_platform == 'darwin'",
-    "python_full_version < '3.11' and platform_machine == 'aarch64' and sys_platform == 'linux'",
-    "(python_full_version < '3.11' and platform_machine != 'aarch64' and sys_platform == 'linux') or (python_full_version < '3.11' and sys_platform != 'darwin' and sys_platform != 'linux')",
-]
-dependencies = [
-    { name = "click", marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
-    { name = "rich", marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
-    { name = "shellingham", marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
-    { name = "typing-extensions", marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/98/1a/5f36851f439884bcfe8539f6a20ff7516e7b60f319bbaf69a90dc35cc2eb/typer-0.15.3.tar.gz", hash = "sha256:818873625d0569653438316567861899f7e9972f2e6e0c16dab608345ced713c", size = 101641, upload-time = "2025-04-28T21:40:59.204Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/48/20/9d953de6f4367163d23ec823200eb3ecb0050a2609691e512c8b95827a9b/typer-0.15.3-py3-none-any.whl", hash = "sha256:c86a65ad77ca531f03de08d1b9cb67cd09ad02ddddf4b34745b5008f43b239bd", size = 45253, upload-time = "2025-04-28T21:40:56.269Z" },
 ]
 
 [[package]]
