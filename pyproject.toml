@@ -8,7 +8,6 @@ dependencies = [
     "fastapi>=0.115.12",
     "firecrawl-py>=2.5.3",
     "langchain-text-splitters>=0.3.8",
-    "langsmith>=0.3.42",
     "numpy>=1.26.4",
     "openai>=1.77.0",
     "pdfplumber>=0.11.6",
@@ -59,6 +58,7 @@ all = [
     "docling-core>=2.30.0",
     "crawl4ai>=0.6.2",
     "sentence-transformers>=4.1.0",
+    "langsmith>=0.3.42",
 ]
 
 voyageai = [
@@ -106,6 +106,9 @@ crawl4ai = [
 
 sentence-transformers = [
     "sentence-transformers>=4.1.0",
+]
+langsmith = [
+    "langsmith>=0.3.42",
 ]
 
 
