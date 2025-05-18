@@ -165,6 +165,7 @@ provide_settings:
 
 query_settings:
   max_iter: 3
+  llm_tracing: false  # Set to true to enable LangSmith tracing for LLM calls (requires LANGSMITH_API_KEY and LANGSMITH_PROJECT environment variables)
 
 load_settings:
   chunk_size: 1500

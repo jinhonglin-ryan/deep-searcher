@@ -38,7 +38,8 @@ class Configuration:
         self.provide_settings = config_data["provide_settings"]
         self.query_settings = config_data["query_settings"]
         self.load_settings = config_data["load_settings"]
-        self._llm_tracing_enabled = False
+        # Load LLM tracing setting from query_settings if available
+        self._llm_tracing_enabled = self.query_settings.get("llm_tracing", False)
 
     def load_config_from_yaml(self, config_path: str):
         """
