@@ -2,6 +2,7 @@ from typing import List, Tuple
 
 from deepsearcher.agent.base import BaseAgent
 from deepsearcher.llm.base import BaseLLM
+from deepsearcher.llm_tracer import lazy_traceable
 from deepsearcher.utils import log
 from deepsearcher.vector_db.base import BaseVectorDB
 
@@ -39,6 +40,11 @@ class CollectionRouter(BaseAgent):
             for collection_info in self.vector_db.list_collections(dim=dim)
         ]
 
+    @lazy_traceable(
+        run_type="tool",
+        name="collection_router",
+        metadata={"description": "Routes queries to appropriate vector collections"},
+    )
     def invoke(self, query: str, dim: int, **kwargs) -> Tuple[List[str], int]:
         """
         Determine which collections are relevant for the given query.

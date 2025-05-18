@@ -2,6 +2,7 @@ from typing import List, Optional, Tuple
 
 from deepsearcher.agent import RAGAgent
 from deepsearcher.llm.base import BaseLLM
+from deepsearcher.llm_tracer import lazy_traceable
 from deepsearcher.utils import log
 from deepsearcher.vector_db import RetrievalResult
 
@@ -53,6 +54,7 @@ class RAGRouter(RAGAgent):
                     "Please provide agent descriptions or set __description__ attribute for each agent class."
                 )
 
+    @lazy_traceable(run_type="tool", name="rag_agent_router")
     def _route(self, query: str) -> Tuple[RAGAgent, int]:
         description_str = "\n".join(
             [f"[{i + 1}]: {description}" for i, description in enumerate(self.agent_descriptions)]
@@ -76,11 +78,18 @@ class RAGRouter(RAGAgent):
         )
         return self.rag_agents[selected_agent_index], chat_response.total_tokens
 
+    @lazy_traceable(run_type="retriever", name="router_retrieve")
     def retrieve(self, query: str, **kwargs) -> Tuple[List[RetrievalResult], int, dict]:
         agent, n_token_router = self._route(query)
         retrieved_results, n_token_retrieval, metadata = agent.retrieve(query, **kwargs)
         return retrieved_results, n_token_router + n_token_retrieval, metadata
 
+    @lazy_traceable(
+        run_type="chain",
+        name="router_query",
+        tags=["router", "rag"],
+        metadata={"description": "Query router to appropriate RAG agent"},
+    )
     def query(self, query: str, **kwargs) -> Tuple[str, List[RetrievalResult], int]:
         agent, n_token_router = self._route(query)
         answer, retrieved_results, n_token_retrieval = agent.query(query, **kwargs)

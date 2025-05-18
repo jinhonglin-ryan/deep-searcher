@@ -8,6 +8,7 @@ dependencies = [
     "fastapi>=0.115.12",
     "firecrawl-py>=2.5.3",
     "langchain-text-splitters>=0.3.8",
+    "langsmith>=0.3.42",
     "numpy>=1.26.4",
     "openai>=1.77.0",
     "pdfplumber>=0.11.6",
@@ -106,6 +107,7 @@ crawl4ai = [
 sentence-transformers = [
     "sentence-transformers>=4.1.0",
 ]
+
 
 
 [build-system]

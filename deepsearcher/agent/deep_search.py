@@ -5,6 +5,7 @@ from deepsearcher.agent.base import RAGAgent, describe_class
 from deepsearcher.agent.collection_router import CollectionRouter
 from deepsearcher.embedding.base import BaseEmbedding
 from deepsearcher.llm.base import BaseLLM
+from deepsearcher.llm_tracer import lazy_traceable
 from deepsearcher.utils import log
 from deepsearcher.vector_db import RetrievalResult
 from deepsearcher.vector_db.base import BaseVectorDB, deduplicate_results
@@ -108,6 +109,7 @@ class DeepSearch(RAGAgent):
         )
         self.text_window_splitter = text_window_splitter
 
+    @lazy_traceable(run_type="llm", name="generate_sub_queries")
     def _generate_sub_queries(self, original_query: str) -> Tuple[List[str], int]:
         chat_response = self.llm.chat(
             messages=[
@@ -117,6 +119,7 @@ class DeepSearch(RAGAgent):
         response_content = self.llm.remove_think(chat_response.content)
         return self.llm.literal_eval(response_content), chat_response.total_tokens
 
+    @lazy_traceable(run_type="retriever", name="search_chunks_from_vectordb")
     async def _search_chunks_from_vectordb(self, query: str, sub_queries: List[str]):
         consume_tokens = 0
         if self.route_collection:
@@ -170,6 +173,7 @@ class DeepSearch(RAGAgent):
                 )
         return all_retrieved_results, consume_tokens
 
+    @lazy_traceable(run_type="llm", name="generate_gap_queries")
     def _generate_gap_queries(
         self, original_query: str, all_sub_queries: List[str], all_chunks: List[RetrievalResult]
     ) -> Tuple[List[str], int]:
@@ -184,6 +188,7 @@ class DeepSearch(RAGAgent):
         response_content = self.llm.remove_think(chat_response.content)
         return self.llm.literal_eval(response_content), chat_response.total_tokens
 
+    @lazy_traceable(run_type="retriever", name="retrieve_documents")
     def retrieve(self, original_query: str, **kwargs) -> Tuple[List[RetrievalResult], int, dict]:
         """
         Retrieve relevant documents from the knowledge base for the given query.
@@ -203,6 +208,7 @@ class DeepSearch(RAGAgent):
         """
         return asyncio.run(self.async_retrieve(original_query, **kwargs))
 
+    @lazy_traceable(run_type="retriever", name="async_retrieve_documents")
     async def async_retrieve(
         self, original_query: str, **kwargs
     ) -> Tuple[List[RetrievalResult], int, dict]:
@@ -268,6 +274,12 @@ class DeepSearch(RAGAgent):
         additional_info = {"all_sub_queries": all_sub_queries}
         return all_search_res, total_tokens, additional_info
 
+    @lazy_traceable(
+        run_type="chain",
+        name="deep_search_query",
+        tags=["search", "rag"],
+        metadata={"description": "Comprehensive search agent query"},
+    )
     def query(self, query: str, **kwargs) -> Tuple[str, List[RetrievalResult], int]:
         """
         Query the agent and generate an answer based on retrieved documents.

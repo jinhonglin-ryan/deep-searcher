@@ -4,6 +4,7 @@ from deepsearcher.agent.base import RAGAgent, describe_class
 from deepsearcher.agent.collection_router import CollectionRouter
 from deepsearcher.embedding.base import BaseEmbedding
 from deepsearcher.llm.base import BaseLLM
+from deepsearcher.llm_tracer import lazy_traceable
 from deepsearcher.utils import log
 from deepsearcher.vector_db import RetrievalResult
 from deepsearcher.vector_db.base import BaseVectorDB, deduplicate_results
@@ -119,6 +120,7 @@ class ChainOfRAG(RAGAgent):
         )
         self.text_window_splitter = text_window_splitter
 
+    @lazy_traceable(run_type="llm", name="reflect_get_subquery")
     def _reflect_get_subquery(self, query: str, intermediate_context: List[str]) -> Tuple[str, int]:
         chat_response = self.llm.chat(
             [
@@ -133,6 +135,7 @@ class ChainOfRAG(RAGAgent):
         )
         return self.llm.remove_think(chat_response.content), chat_response.total_tokens
 
+    @lazy_traceable(run_type="retriever", name="retrieve_and_answer")
     def _retrieve_and_answer(self, query: str) -> Tuple[str, List[RetrievalResult], int]:
         consume_tokens = 0
         if self.route_collection:
@@ -169,6 +172,7 @@ class ChainOfRAG(RAGAgent):
             consume_tokens + chat_response.total_tokens,
         )
 
+    @lazy_traceable(run_type="parser", name="get_supported_docs")
     def _get_supported_docs(
         self,
         retrieved_results: List[RetrievalResult],
@@ -199,6 +203,7 @@ class ChainOfRAG(RAGAgent):
             token_usage = chat_response.total_tokens
         return supported_retrieved_results, token_usage
 
+    @lazy_traceable(run_type="llm", name="check_has_enough_info")
     def _check_has_enough_info(
         self, query: str, intermediate_contexts: List[str]
     ) -> Tuple[bool, int]:
@@ -219,6 +224,9 @@ class ChainOfRAG(RAGAgent):
         has_enough_info = self.llm.remove_think(chat_response.content).strip().lower() == "yes"
         return has_enough_info, chat_response.total_tokens
 
+    @lazy_traceable(
+        run_type="retriever", name="chain_of_thought_retrieve", tags=["rag", "retrieval"]
+    )
     def retrieve(self, query: str, **kwargs) -> Tuple[List[RetrievalResult], int, dict]:
         """
         Retrieves relevant documents based on the input query and iteratively refines the search.
@@ -274,6 +282,12 @@ class ChainOfRAG(RAGAgent):
         additional_info = {"intermediate_context": intermediate_contexts}
         return all_retrieved_results, token_usage, additional_info
 
+    @lazy_traceable(
+        run_type="chain",
+        name="chain_of_rag_query",
+        tags=["rag", "reasoning"],
+        metadata={"description": "Multi-hop reasoning query agent"},
+    )
     def query(self, query: str, **kwargs) -> Tuple[str, List[RetrievalResult], int]:
         """
         Executes a query and returns the final answer along with all retrieved results and total token usage.

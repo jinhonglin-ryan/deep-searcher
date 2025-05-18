@@ -3,6 +3,8 @@ import re
 from abc import ABC
 from typing import Dict, List
 
+from deepsearcher.llm_tracer import lazy_traceable
+
 
 class ChatResponse(ABC):
     """
@@ -51,6 +53,7 @@ class BaseLLM(ABC):
         """
         pass
 
+    @lazy_traceable(run_type="llm", name="base_llm_chat")
     def chat(self, messages: List[Dict]) -> ChatResponse:
         """
         Send a chat message to the language model and get a response.

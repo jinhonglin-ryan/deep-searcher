@@ -4,6 +4,7 @@ from deepsearcher.agent.base import RAGAgent
 from deepsearcher.agent.collection_router import CollectionRouter
 from deepsearcher.embedding.base import BaseEmbedding
 from deepsearcher.llm.base import BaseLLM
+from deepsearcher.llm_tracer import lazy_traceable
 from deepsearcher.utils import log
 from deepsearcher.vector_db.base import BaseVectorDB, RetrievalResult, deduplicate_results
 
@@ -92,6 +93,12 @@ class NaiveRAG(RAGAgent):
         all_retrieved_results = deduplicate_results(all_retrieved_results)
         return all_retrieved_results, consume_tokens, {}
 
+    @lazy_traceable(
+        run_type="chain",
+        name="naive_rag_query",
+        tags=["rag", "simple"],
+        metadata={"description": "Simple RAG query agent"},
+    )
     def query(self, query: str, **kwargs) -> Tuple[str, List[RetrievalResult], int]:
         """
         Query the agent and generate an answer based on retrieved documents.

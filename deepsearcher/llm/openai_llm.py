@@ -2,6 +2,7 @@ import os
 from typing import Dict, List
 
 from deepsearcher.llm.base import BaseLLM, ChatResponse
+from deepsearcher.llm_tracer import wrap_client
 
 
 class OpenAI(BaseLLM):
@@ -37,7 +38,9 @@ class OpenAI(BaseLLM):
             base_url = kwargs.pop("base_url")
         else:
             base_url = os.getenv("OPENAI_BASE_URL")
-        self.client = OpenAI_(api_key=api_key, base_url=base_url, **kwargs)
+
+        openai_client = OpenAI_(api_key=api_key, base_url=base_url, **kwargs)
+        self.client = wrap_client(openai_client, client_type="openai")
 
     def chat(self, messages: List[Dict]) -> ChatResponse:
         """
