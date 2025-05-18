@@ -36,7 +36,6 @@ def main():
         sys.exit(1)
 
     config = Configuration()  # Customize your config here
-    init_config(config=config)
 
     parser = argparse.ArgumentParser(prog="deepsearcher", description="Deep Searcher.")
     subparsers = parser.add_subparsers(dest="subcommand", title="subcommands")
@@ -49,6 +48,11 @@ def main():
         type=int,
         default=3,
         help="Max iterations of reflection. Default is 3.",
+    )
+    query_parser.add_argument(
+        "--llm_tracing",
+        action="store_true",
+        help="Enable LangSmith tracing for LLM calls. Requires LANGSMITH_API_KEY and LANGSMITH_PROJECT environment variables.",
     )
 
     ## Arguments of loading
@@ -87,7 +91,14 @@ def main():
     )
 
     args = parser.parse_args()
+
     if args.subcommand == "query":
+        # Only enable LLM tracing for query subcommand if requested
+        if hasattr(args, "llm_tracing") and args.llm_tracing:
+            config.llm_tracing = True
+
+        init_config(config=config)
+
         final_answer, refs, consumed_tokens = query(args.query, max_iter=args.max_iter)
         log.color_print("\n==== FINAL ANSWER====\n")
         log.color_print(final_answer)
@@ -95,6 +106,8 @@ def main():
         for i, ref in enumerate(refs):
             log.color_print(f"{i + 1}. {ref.text[:60]}… {ref.reference}")
     elif args.subcommand == "load":
+        init_config(config=config)
+
         urls = [url for url in args.load_path if url.startswith("http")]
         local_files = [file for file in args.load_path if not file.startswith("http")]
         kwargs = {}
