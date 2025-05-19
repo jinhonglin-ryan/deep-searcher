@@ -2,6 +2,7 @@ import os
 from typing import Dict, List
 
 from deepsearcher.llm.base import BaseLLM, ChatResponse
+from deepsearcher.llm_tracer import wrap_client
 
 
 class DeepSeek(BaseLLM):
@@ -40,7 +41,8 @@ class DeepSeek(BaseLLM):
             base_url = kwargs.pop("base_url")
         else:
             base_url = os.getenv("DEEPSEEK_BASE_URL", default="https://api.deepseek.com")
-        self.client = OpenAI_(api_key=api_key, base_url=base_url, **kwargs)
+        deep_seek_client = OpenAI_(api_key=api_key, base_url=base_url, **kwargs)
+        self.client = wrap_client(deep_seek_client, client_type="deepseek")
 
     def chat(self, messages: List[Dict]) -> ChatResponse:
         """

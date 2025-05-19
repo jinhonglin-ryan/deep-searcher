@@ -2,6 +2,7 @@ import os
 from typing import Dict, List
 
 from deepsearcher.llm.base import BaseLLM, ChatResponse
+from deepsearcher.llm_tracer import wrap_client
 
 
 class Aliyun(BaseLLM):
@@ -42,7 +43,8 @@ class Aliyun(BaseLLM):
         else:
             base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
-        self.client = OpenAI_(api_key=api_key, base_url=base_url, **kwargs)
+        aliyun_client = OpenAI_(api_key=api_key, base_url=base_url, **kwargs)
+        self.client = wrap_client(aliyun_client, client_type="aliyun")
 
     def chat(self, messages: List[Dict]) -> ChatResponse:
         """

@@ -2,6 +2,7 @@ import os
 from typing import Dict, List
 
 from deepsearcher.llm.base import BaseLLM, ChatResponse
+from deepsearcher.llm_tracer import wrap_client
 
 
 class SiliconFlow(BaseLLM):
@@ -39,7 +40,8 @@ class SiliconFlow(BaseLLM):
             base_url = kwargs.pop("base_url")
         else:
             base_url = "https://api.siliconflow.cn/v1"
-        self.client = OpenAI_(api_key=api_key, base_url=base_url, **kwargs)
+        siliconflow_client = OpenAI_(api_key=api_key, base_url=base_url, **kwargs)
+        self.client = wrap_client(siliconflow_client, client_type="siliconflow")
 
     def chat(self, messages: List[Dict]) -> ChatResponse:
         """

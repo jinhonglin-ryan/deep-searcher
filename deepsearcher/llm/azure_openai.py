@@ -1,6 +1,7 @@
 from typing import Dict, List
 
 from deepsearcher.llm.base import BaseLLM, ChatResponse
+from deepsearcher.llm_tracer import wrap_client
 
 
 class AzureOpenAI(BaseLLM):
@@ -32,18 +33,19 @@ class AzureOpenAI(BaseLLM):
         self.model = model
         import os
 
-        from openai import AzureOpenAI
+        from openai import AzureOpenAI as AzureOpenAI_
 
         if azure_endpoint is None:
             azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
         if api_key is None:
             api_key = os.getenv("AZURE_OPENAI_KEY")
-        self.client = AzureOpenAI(
+        azure_openai_client = AzureOpenAI_(
             azure_endpoint=azure_endpoint,
             api_key=api_key,
             api_version=api_version,
             **kwargs,
         )
+        self.client = wrap_client(azure_openai_client, client_type="azure_openai")
 
     def chat(self, messages: List[Dict]) -> ChatResponse:
         """

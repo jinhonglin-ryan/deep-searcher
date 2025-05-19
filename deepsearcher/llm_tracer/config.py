@@ -49,7 +49,18 @@ def wrap_client(client: Any, client_type: str = "openai") -> Any:
     try:
         from langsmith.wrappers import wrap_anthropic, wrap_openai
 
-        if client_type.lower() == "openai":
+        openai_compatible_clients = [
+            "openai",
+            "deepseek",
+            "azure_openai",
+            "xai",
+            "volcengine",
+            "siliconflow",
+            "ppio",
+            "aliyun",
+        ]
+
+        if client_type.lower() in openai_compatible_clients:
             return wrap_openai(client)
         elif client_type.lower() == "anthropic":
             return wrap_anthropic(client)

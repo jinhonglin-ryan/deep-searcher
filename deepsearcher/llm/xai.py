@@ -2,6 +2,7 @@ import os
 from typing import Dict, List
 
 from deepsearcher.llm.base import BaseLLM, ChatResponse
+from deepsearcher.llm_tracer import wrap_client
 
 
 class XAI(BaseLLM):
@@ -39,7 +40,8 @@ class XAI(BaseLLM):
             base_url = kwargs.pop("base_url")
         else:
             base_url = "https://api.x.ai/v1"
-        self.client = OpenAI_(api_key=api_key, base_url=base_url, **kwargs)
+        xai_client = OpenAI_(api_key=api_key, base_url=base_url, **kwargs)
+        self.client = wrap_client(xai_client, client_type="xai")
 
     def chat(self, messages: List[Dict]) -> ChatResponse:
         """

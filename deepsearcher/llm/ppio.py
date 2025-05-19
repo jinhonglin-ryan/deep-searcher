@@ -2,6 +2,7 @@ import os
 from typing import Dict, List
 
 from deepsearcher.llm.base import BaseLLM, ChatResponse
+from deepsearcher.llm_tracer import wrap_client
 
 
 class PPIO(BaseLLM):
@@ -37,7 +38,8 @@ class PPIO(BaseLLM):
             base_url = kwargs.pop("base_url")
         else:
             base_url = "https://api.ppinfra.com/v3/openai"
-        self.client = OpenAI_(api_key=api_key, base_url=base_url, **kwargs)
+        ppio_client = OpenAI_(api_key=api_key, base_url=base_url, **kwargs)
+        self.client = wrap_client(ppio_client, client_type="ppio")
 
     def chat(self, messages: List[Dict]) -> ChatResponse:
         """
