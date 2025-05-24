@@ -44,22 +44,22 @@ class TestTogetherAI(unittest.TestCase):
         self.module_patcher = patch.dict('sys.modules', {'together': self.mock_together})
         self.module_patcher.start()
 
-        # Create instance to test with default model
-        self.llm = TogetherAI()
-
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
 
     def test_init_default(self):
         """Test initialization with default parameters."""
-        # Check that Together client was initialized correctly
-        self.mock_together.Together.assert_called_once_with(
-            api_key=None
-        )
-        
-        # Check default model
-        self.assertEqual(self.llm.model, "deepseek-ai/DeepSeek-R1")
+        # Clear environment variables temporarily
+        with patch.dict('os.environ', {}, clear=True):
+            llm = TogetherAI()
+            # Check that Together client was initialized correctly
+            self.mock_together.Together.assert_called_once_with(
+                api_key=None
+            )
+            
+            # Check default model
+            self.assertEqual(llm.model, "deepseek-ai/DeepSeek-R1")
 
     def test_init_with_api_key_from_env(self):
         """Test initialization with API key from environment variable."""
@@ -72,22 +72,28 @@ class TestTogetherAI(unittest.TestCase):
 
     def test_init_with_api_key_parameter(self):
         """Test initialization with API key as parameter."""
-        api_key = "test_api_key_param"
-        llm = TogetherAI(api_key=api_key)
-        self.mock_together.Together.assert_called_with(
-            api_key=api_key
-        )
+        with patch.dict('os.environ', {}, clear=True):
+            api_key = "test_api_key_param"
+            llm = TogetherAI(api_key=api_key)
+            self.mock_together.Together.assert_called_with(
+                api_key=api_key
+            )
 
     def test_init_with_custom_model(self):
         """Test initialization with custom model."""
-        model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
-        llm = TogetherAI(model=model)
-        self.assertEqual(llm.model, model)
+        with patch.dict('os.environ', {}, clear=True):
+            model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+            llm = TogetherAI(model=model)
+            self.assertEqual(llm.model, model)
 
     def test_chat_single_message(self):
         """Test chat with a single message."""
+        # Create TogetherAI instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = TogetherAI()
+            
         messages = [{"role": "user", "content": "Hello"}]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that completions.create was called correctly
         self.mock_completions.create.assert_called_once()
@@ -102,13 +108,17 @@ class TestTogetherAI(unittest.TestCase):
 
     def test_chat_multiple_messages(self):
         """Test chat with multiple messages."""
+        # Create TogetherAI instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = TogetherAI()
+            
         messages = [
             {"role": "system", "content": "You are a helpful assistant"},
             {"role": "user", "content": "Hello"},
             {"role": "assistant", "content": "Hi there!"},
             {"role": "user", "content": "How are you?"}
         ]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that completions.create was called correctly
         self.mock_completions.create.assert_called_once()
@@ -123,12 +133,16 @@ class TestTogetherAI(unittest.TestCase):
 
     def test_chat_with_error(self):
         """Test chat when an error occurs."""
+        # Create TogetherAI instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = TogetherAI()
+            
         # Mock an error response
         self.mock_completions.create.side_effect = Exception("Together API Error")
 
         messages = [{"role": "user", "content": "Hello"}]
         with self.assertRaises(Exception) as context:
-            self.llm.chat(messages)
+            llm.chat(messages)
 
         self.assertEqual(str(context.exception), "Together API Error")
 

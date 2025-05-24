@@ -44,23 +44,23 @@ class TestAliyun(unittest.TestCase):
         self.module_patcher = patch.dict('sys.modules', {'openai': self.mock_openai})
         self.module_patcher.start()
 
-        # Create instance to test with default model
-        self.llm = Aliyun()
-
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
 
     def test_init_default(self):
         """Test initialization with default parameters."""
-        # Check that OpenAI client was initialized correctly
-        self.mock_openai.OpenAI.assert_called_once_with(
-            api_key=None,
-            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"
-        )
-        
-        # Check default model
-        self.assertEqual(self.llm.model, "deepseek-r1")
+        # Clear environment variables temporarily
+        with patch.dict('os.environ', {}, clear=True):
+            llm = Aliyun()
+            # Check that OpenAI client was initialized correctly
+            self.mock_openai.OpenAI.assert_called_once_with(
+                api_key=None,
+                base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"
+            )
+            
+            # Check default model
+            self.assertEqual(llm.model, "deepseek-r1")
 
     def test_init_with_api_key_from_env(self):
         """Test initialization with API key from environment variable."""
@@ -74,75 +74,90 @@ class TestAliyun(unittest.TestCase):
 
     def test_init_with_api_key_parameter(self):
         """Test initialization with API key as parameter."""
-        api_key = "test_api_key_param"
-        llm = Aliyun(api_key=api_key)
-        self.mock_openai.OpenAI.assert_called_with(
-            api_key=api_key,
-            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"
-        )
+        with patch.dict('os.environ', {}, clear=True):
+            api_key = "test_api_key_param"
+            llm = Aliyun(api_key=api_key)
+            self.mock_openai.OpenAI.assert_called_with(
+                api_key=api_key,
+                base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"
+            )
 
     def test_init_with_custom_model(self):
         """Test initialization with custom model."""
-        model = "qwen-max"
-        llm = Aliyun(model=model)
-        self.assertEqual(llm.model, model)
+        with patch.dict('os.environ', {}, clear=True):
+            model = "qwen-max"
+            llm = Aliyun(model=model)
+            self.assertEqual(llm.model, model)
 
     def test_init_with_custom_base_url(self):
         """Test initialization with custom base URL."""
-        base_url = "https://custom.aliyun.api"
-        llm = Aliyun(base_url=base_url)
-        self.mock_openai.OpenAI.assert_called_with(
-            api_key=None,
-            base_url=base_url
-        )
+        with patch.dict('os.environ', {}, clear=True):
+            base_url = "https://custom.aliyun.api"
+            llm = Aliyun(base_url=base_url)
+            self.mock_openai.OpenAI.assert_called_with(
+                api_key=None,
+                base_url=base_url
+            )
 
     def test_chat_single_message(self):
         """Test chat with a single message."""
-        messages = [{"role": "user", "content": "Hello"}]
-        response = self.llm.chat(messages)
+        # Create Aliyun instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = Aliyun()
+            
+            messages = [{"role": "user", "content": "Hello"}]
+            response = llm.chat(messages)
 
-        # Check that completions.create was called correctly
-        self.mock_completions.create.assert_called_once()
-        call_args = self.mock_completions.create.call_args
-        self.assertEqual(call_args[1]["model"], "deepseek-r1")
-        self.assertEqual(call_args[1]["messages"], messages)
+            # Check that completions.create was called correctly
+            self.mock_completions.create.assert_called_once()
+            call_args = self.mock_completions.create.call_args
+            self.assertEqual(call_args[1]["model"], "deepseek-r1")
+            self.assertEqual(call_args[1]["messages"], messages)
 
-        # Check response
-        self.assertIsInstance(response, ChatResponse)
-        self.assertEqual(response.content, "Test response")
-        self.assertEqual(response.total_tokens, 100)
+            # Check response
+            self.assertIsInstance(response, ChatResponse)
+            self.assertEqual(response.content, "Test response")
+            self.assertEqual(response.total_tokens, 100)
 
     def test_chat_multiple_messages(self):
         """Test chat with multiple messages."""
-        messages = [
-            {"role": "system", "content": "You are a helpful assistant"},
-            {"role": "user", "content": "Hello"},
-            {"role": "assistant", "content": "Hi there!"},
-            {"role": "user", "content": "How are you?"}
-        ]
-        response = self.llm.chat(messages)
+        # Create Aliyun instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = Aliyun()
+            
+            messages = [
+                {"role": "system", "content": "You are a helpful assistant"},
+                {"role": "user", "content": "Hello"},
+                {"role": "assistant", "content": "Hi there!"},
+                {"role": "user", "content": "How are you?"}
+            ]
+            response = llm.chat(messages)
 
-        # Check that completions.create was called correctly
-        self.mock_completions.create.assert_called_once()
-        call_args = self.mock_completions.create.call_args
-        self.assertEqual(call_args[1]["model"], "deepseek-r1")
-        self.assertEqual(call_args[1]["messages"], messages)
+            # Check that completions.create was called correctly
+            self.mock_completions.create.assert_called_once()
+            call_args = self.mock_completions.create.call_args
+            self.assertEqual(call_args[1]["model"], "deepseek-r1")
+            self.assertEqual(call_args[1]["messages"], messages)
 
-        # Check response
-        self.assertIsInstance(response, ChatResponse)
-        self.assertEqual(response.content, "Test response")
-        self.assertEqual(response.total_tokens, 100)
+            # Check response
+            self.assertIsInstance(response, ChatResponse)
+            self.assertEqual(response.content, "Test response")
+            self.assertEqual(response.total_tokens, 100)
 
     def test_chat_with_error(self):
         """Test chat when an error occurs."""
-        # Mock an error response
-        self.mock_completions.create.side_effect = Exception("Aliyun API Error")
+        # Create Aliyun instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = Aliyun()
+            
+            # Mock an error response
+            self.mock_completions.create.side_effect = Exception("Aliyun API Error")
 
-        messages = [{"role": "user", "content": "Hello"}]
-        with self.assertRaises(Exception) as context:
-            self.llm.chat(messages)
+            messages = [{"role": "user", "content": "Hello"}]
+            with self.assertRaises(Exception) as context:
+                llm.chat(messages)
 
-        self.assertEqual(str(context.exception), "Aliyun API Error")
+            self.assertEqual(str(context.exception), "Aliyun API Error")
 
 
 if __name__ == "__main__":

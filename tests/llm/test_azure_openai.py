@@ -50,29 +50,29 @@ class TestAzureOpenAI(unittest.TestCase):
         self.test_api_key = "test_api_key"
         self.test_api_version = "2024-02-15"
 
-        # Create instance to test
-        self.llm = AzureOpenAI(
-            model=self.test_model,
-            azure_endpoint=self.test_endpoint,
-            api_key=self.test_api_key,
-            api_version=self.test_api_version
-        )
-
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
 
     def test_init_with_parameters(self):
         """Test initialization with explicit parameters."""
-        # Check that Azure OpenAI client was initialized correctly
-        self.mock_openai.AzureOpenAI.assert_called_once_with(
-            azure_endpoint=self.test_endpoint,
-            api_key=self.test_api_key,
-            api_version=self.test_api_version
-        )
-        
-        # Check model attribute
-        self.assertEqual(self.llm.model, self.test_model)
+        # Clear environment variables temporarily
+        with patch.dict('os.environ', {}, clear=True):
+            llm = AzureOpenAI(
+                model=self.test_model,
+                azure_endpoint=self.test_endpoint,
+                api_key=self.test_api_key,
+                api_version=self.test_api_version
+            )
+            # Check that Azure OpenAI client was initialized correctly
+            self.mock_openai.AzureOpenAI.assert_called_once_with(
+                azure_endpoint=self.test_endpoint,
+                api_key=self.test_api_key,
+                api_version=self.test_api_version
+            )
+            
+            # Check model attribute
+            self.assertEqual(llm.model, self.test_model)
 
     def test_init_with_env_variables(self):
         """Test initialization with environment variables."""
@@ -92,8 +92,17 @@ class TestAzureOpenAI(unittest.TestCase):
 
     def test_chat_single_message(self):
         """Test chat with a single message."""
+        # Create Azure OpenAI instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = AzureOpenAI(
+                model=self.test_model,
+                azure_endpoint=self.test_endpoint,
+                api_key=self.test_api_key,
+                api_version=self.test_api_version
+            )
+            
         messages = [{"role": "user", "content": "Hello"}]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that completions.create was called correctly
         self.mock_completions.create.assert_called_once()
@@ -108,13 +117,22 @@ class TestAzureOpenAI(unittest.TestCase):
 
     def test_chat_multiple_messages(self):
         """Test chat with multiple messages."""
+        # Create Azure OpenAI instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = AzureOpenAI(
+                model=self.test_model,
+                azure_endpoint=self.test_endpoint,
+                api_key=self.test_api_key,
+                api_version=self.test_api_version
+            )
+            
         messages = [
             {"role": "system", "content": "You are a helpful assistant"},
             {"role": "user", "content": "Hello"},
             {"role": "assistant", "content": "Hi there!"},
             {"role": "user", "content": "How are you?"}
         ]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that completions.create was called correctly
         self.mock_completions.create.assert_called_once()
@@ -129,12 +147,21 @@ class TestAzureOpenAI(unittest.TestCase):
 
     def test_chat_with_error(self):
         """Test chat when an error occurs."""
+        # Create Azure OpenAI instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = AzureOpenAI(
+                model=self.test_model,
+                azure_endpoint=self.test_endpoint,
+                api_key=self.test_api_key,
+                api_version=self.test_api_version
+            )
+            
         # Mock an error response
         self.mock_completions.create.side_effect = Exception("Azure OpenAI API Error")
 
         messages = [{"role": "user", "content": "Hello"}]
         with self.assertRaises(Exception) as context:
-            self.llm.chat(messages)
+            llm.chat(messages)
 
         self.assertEqual(str(context.exception), "Azure OpenAI API Error")
 

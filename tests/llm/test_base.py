@@ -1,9 +1,20 @@
 import unittest
 from deepsearcher.llm.base import BaseLLM, ChatResponse
+from unittest.mock import patch
 
 
 class TestBaseLLM(unittest.TestCase):
     """Tests for the BaseLLM abstract base class."""
+
+    def setUp(self):
+        """Set up test fixtures."""
+        # Clear environment variables temporarily
+        self.env_patcher = patch.dict('os.environ', {}, clear=True)
+        self.env_patcher.start()
+
+    def tearDown(self):
+        """Clean up test fixtures."""
+        self.env_patcher.stop()
 
     def test_chat_response_init(self):
         """Test ChatResponse initialization and representation."""

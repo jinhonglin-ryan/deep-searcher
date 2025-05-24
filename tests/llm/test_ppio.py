@@ -44,23 +44,23 @@ class TestPPIO(unittest.TestCase):
         self.module_patcher = patch.dict('sys.modules', {'openai': self.mock_openai})
         self.module_patcher.start()
 
-        # Create instance to test with default model
-        self.llm = PPIO()
-
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
 
     def test_init_default(self):
         """Test initialization with default parameters."""
-        # Check that OpenAI client was initialized correctly
-        self.mock_openai.OpenAI.assert_called_once_with(
-            api_key=None,
-            base_url="https://api.ppinfra.com/v3/openai"
-        )
-        
-        # Check default model
-        self.assertEqual(self.llm.model, "deepseek/deepseek-r1-turbo")
+        # Clear environment variables temporarily
+        with patch.dict('os.environ', {}, clear=True):
+            llm = PPIO()
+            # Check that OpenAI client was initialized correctly
+            self.mock_openai.OpenAI.assert_called_once_with(
+                api_key=None,
+                base_url="https://api.ppinfra.com/v3/openai"
+            )
+            
+            # Check default model
+            self.assertEqual(llm.model, "deepseek/deepseek-r1-turbo")
 
     def test_init_with_api_key_from_env(self):
         """Test initialization with API key from environment variable."""
@@ -74,32 +74,40 @@ class TestPPIO(unittest.TestCase):
 
     def test_init_with_api_key_parameter(self):
         """Test initialization with API key as parameter."""
-        api_key = "test_api_key_param"
-        llm = PPIO(api_key=api_key)
-        self.mock_openai.OpenAI.assert_called_with(
-            api_key=api_key,
-            base_url="https://api.ppinfra.com/v3/openai"
-        )
+        with patch.dict('os.environ', {}, clear=True):
+            api_key = "test_api_key_param"
+            llm = PPIO(api_key=api_key)
+            self.mock_openai.OpenAI.assert_called_with(
+                api_key=api_key,
+                base_url="https://api.ppinfra.com/v3/openai"
+            )
 
     def test_init_with_custom_model(self):
         """Test initialization with custom model."""
-        model = "deepseek/deepseek-r1-max"
-        llm = PPIO(model=model)
-        self.assertEqual(llm.model, model)
+        with patch.dict('os.environ', {}, clear=True):
+            model = "deepseek/deepseek-r1-max"
+            llm = PPIO(model=model)
+            self.assertEqual(llm.model, model)
 
     def test_init_with_custom_base_url(self):
         """Test initialization with custom base URL."""
-        base_url = "https://custom.ppio.api"
-        llm = PPIO(base_url=base_url)
-        self.mock_openai.OpenAI.assert_called_with(
-            api_key=None,
-            base_url=base_url
-        )
+        # Clear environment variables temporarily
+        with patch.dict('os.environ', {}, clear=True):
+            base_url = "https://custom.ppio.api"
+            llm = PPIO(base_url=base_url)
+            self.mock_openai.OpenAI.assert_called_with(
+                api_key=None,
+                base_url=base_url
+            )
 
     def test_chat_single_message(self):
         """Test chat with a single message."""
+        # Create PPIO instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = PPIO()
+            
         messages = [{"role": "user", "content": "Hello"}]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that completions.create was called correctly
         self.mock_completions.create.assert_called_once()
@@ -114,13 +122,17 @@ class TestPPIO(unittest.TestCase):
 
     def test_chat_multiple_messages(self):
         """Test chat with multiple messages."""
+        # Create PPIO instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = PPIO()
+            
         messages = [
             {"role": "system", "content": "You are a helpful assistant"},
             {"role": "user", "content": "Hello"},
             {"role": "assistant", "content": "Hi there!"},
             {"role": "user", "content": "How are you?"}
         ]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that completions.create was called correctly
         self.mock_completions.create.assert_called_once()
@@ -135,12 +147,16 @@ class TestPPIO(unittest.TestCase):
 
     def test_chat_with_error(self):
         """Test chat when an error occurs."""
+        # Create PPIO instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = PPIO()
+            
         # Mock an error response
         self.mock_completions.create.side_effect = Exception("PPIO API Error")
 
         messages = [{"role": "user", "content": "Hello"}]
         with self.assertRaises(Exception) as context:
-            self.llm.chat(messages)
+            llm.chat(messages)
 
         self.assertEqual(str(context.exception), "PPIO API Error")
 

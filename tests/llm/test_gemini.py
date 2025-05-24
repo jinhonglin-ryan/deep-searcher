@@ -34,20 +34,20 @@ class TestGemini(unittest.TestCase):
         self.module_patcher = patch.dict('sys.modules', {'google.genai': self.mock_genai})
         self.module_patcher.start()
 
-        # Create instance to test with default model
-        self.llm = Gemini()
-
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
 
     def test_init_default(self):
         """Test initialization with default parameters."""
-        # Check that Client was initialized correctly
-        self.mock_genai.Client.assert_called_once_with(api_key=None)
-        
-        # Check default model
-        self.assertEqual(self.llm.model, "gemini-2.0-flash")
+        # Clear environment variables temporarily
+        with patch.dict('os.environ', {}, clear=True):
+            llm = Gemini()
+            # Check that Client was initialized correctly
+            self.mock_genai.Client.assert_called_once_with(api_key=None)
+            
+            # Check default model
+            self.assertEqual(llm.model, "gemini-2.0-flash")
 
     def test_init_with_api_key_from_env(self):
         """Test initialization with API key from environment variable."""
@@ -58,20 +58,26 @@ class TestGemini(unittest.TestCase):
 
     def test_init_with_api_key_parameter(self):
         """Test initialization with API key as parameter."""
-        api_key = "test_api_key_param"
-        llm = Gemini(api_key=api_key)
-        self.mock_genai.Client.assert_called_with(api_key=api_key)
+        with patch.dict('os.environ', {}, clear=True):
+            api_key = "test_api_key_param"
+            llm = Gemini(api_key=api_key)
+            self.mock_genai.Client.assert_called_with(api_key=api_key)
 
     def test_init_with_custom_model(self):
         """Test initialization with custom model."""
-        model = "gemini-pro"
-        llm = Gemini(model=model)
-        self.assertEqual(llm.model, model)
+        with patch.dict('os.environ', {}, clear=True):
+            model = "gemini-pro"
+            llm = Gemini(model=model)
+            self.assertEqual(llm.model, model)
 
     def test_chat_single_message(self):
         """Test chat with a single message."""
+        # Create Gemini instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = Gemini()
+            
         messages = [{"role": "user", "content": "Hello"}]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that generate_content was called correctly
         self.mock_client.models.generate_content.assert_called_once()
@@ -86,13 +92,17 @@ class TestGemini(unittest.TestCase):
 
     def test_chat_multiple_messages(self):
         """Test chat with multiple messages."""
+        # Create Gemini instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = Gemini()
+            
         messages = [
             {"role": "system", "content": "You are a helpful assistant"},
             {"role": "user", "content": "Hello"},
             {"role": "assistant", "content": "Hi there!"},
             {"role": "user", "content": "How are you?"}
         ]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that generate_content was called correctly
         self.mock_client.models.generate_content.assert_called_once()
@@ -108,12 +118,16 @@ class TestGemini(unittest.TestCase):
 
     def test_chat_with_error(self):
         """Test chat when an error occurs."""
+        # Create Gemini instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = Gemini()
+            
         # Mock an error response
         self.mock_client.models.generate_content.side_effect = Exception("API Error")
 
         messages = [{"role": "user", "content": "Hello"}]
         with self.assertRaises(Exception) as context:
-            self.llm.chat(messages)
+            llm.chat(messages)
 
         self.assertEqual(str(context.exception), "API Error")
 

@@ -43,24 +43,24 @@ class TestAnthropic(unittest.TestCase):
         self.module_patcher = patch.dict('sys.modules', {'anthropic': self.mock_anthropic})
         self.module_patcher.start()
 
-        # Create instance to test with default model
-        self.llm = Anthropic()
-
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
 
     def test_init_default(self):
         """Test initialization with default parameters."""
-        # Check that Anthropic client was initialized correctly
-        self.mock_anthropic.Anthropic.assert_called_once_with(
-            api_key=None,
-            base_url=None
-        )
-        
-        # Check default attributes
-        self.assertEqual(self.llm.model, "claude-sonnet-4-0")
-        self.assertEqual(self.llm.max_tokens, 8192)
+        # Clear environment variables temporarily
+        with patch.dict('os.environ', {}, clear=True):
+            llm = Anthropic()
+            # Check that Anthropic client was initialized correctly
+            self.mock_anthropic.Anthropic.assert_called_once_with(
+                api_key=None,
+                base_url=None
+            )
+            
+            # Check default attributes
+            self.assertEqual(llm.model, "claude-sonnet-4-0")
+            self.assertEqual(llm.max_tokens, 8192)
 
     def test_init_with_api_key_from_env(self):
         """Test initialization with API key from environment variable."""
@@ -74,34 +74,42 @@ class TestAnthropic(unittest.TestCase):
 
     def test_init_with_api_key_parameter(self):
         """Test initialization with API key as parameter."""
-        api_key = "test_api_key_param"
-        llm = Anthropic(api_key=api_key)
-        self.mock_anthropic.Anthropic.assert_called_with(
-            api_key=api_key,
-            base_url=None
-        )
+        with patch.dict('os.environ', {}, clear=True):
+            api_key = "test_api_key_param"
+            llm = Anthropic(api_key=api_key)
+            self.mock_anthropic.Anthropic.assert_called_with(
+                api_key=api_key,
+                base_url=None
+            )
 
     def test_init_with_custom_model_and_tokens(self):
         """Test initialization with custom model and max tokens."""
-        model = "claude-3-opus-20240229"
-        max_tokens = 4096
-        llm = Anthropic(model=model, max_tokens=max_tokens)
-        self.assertEqual(llm.model, model)
-        self.assertEqual(llm.max_tokens, max_tokens)
+        with patch.dict('os.environ', {}, clear=True):
+            model = "claude-3-opus-20240229"
+            max_tokens = 4096
+            llm = Anthropic(model=model, max_tokens=max_tokens)
+            self.assertEqual(llm.model, model)
+            self.assertEqual(llm.max_tokens, max_tokens)
 
     def test_init_with_custom_base_url(self):
         """Test initialization with custom base URL."""
-        base_url = "https://custom.anthropic.api"
-        llm = Anthropic(base_url=base_url)
-        self.mock_anthropic.Anthropic.assert_called_with(
-            api_key=None,
-            base_url=base_url
-        )
+        # Clear environment variables temporarily
+        with patch.dict('os.environ', {}, clear=True):
+            base_url = "https://custom.anthropic.api"
+            llm = Anthropic(base_url=base_url)
+            self.mock_anthropic.Anthropic.assert_called_with(
+                api_key=None,
+                base_url=base_url
+            )
 
     def test_chat_single_message(self):
         """Test chat with a single message."""
+        # Create Anthropic instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = Anthropic()
+            
         messages = [{"role": "user", "content": "Hello"}]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that messages.create was called correctly
         self.mock_client.messages.create.assert_called_once()
@@ -117,13 +125,17 @@ class TestAnthropic(unittest.TestCase):
 
     def test_chat_multiple_messages(self):
         """Test chat with multiple messages."""
+        # Create Anthropic instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = Anthropic()
+            
         messages = [
             {"role": "system", "content": "You are a helpful assistant"},
             {"role": "user", "content": "Hello"},
             {"role": "assistant", "content": "Hi there!"},
             {"role": "user", "content": "How are you?"}
         ]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that messages.create was called correctly
         self.mock_client.messages.create.assert_called_once()
@@ -139,12 +151,16 @@ class TestAnthropic(unittest.TestCase):
 
     def test_chat_with_error(self):
         """Test chat when an error occurs."""
+        # Create Anthropic instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = Anthropic()
+            
         # Mock an error response
         self.mock_client.messages.create.side_effect = Exception("Anthropic API Error")
 
         messages = [{"role": "user", "content": "Hello"}]
         with self.assertRaises(Exception) as context:
-            self.llm.chat(messages)
+            llm.chat(messages)
 
         self.assertEqual(str(context.exception), "Anthropic API Error")
 

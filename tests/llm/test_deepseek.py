@@ -44,72 +44,74 @@ class TestDeepSeek(unittest.TestCase):
         self.module_patcher = patch.dict('sys.modules', {'openai': self.mock_openai})
         self.module_patcher.start()
 
-        # Create instance to test with default model
-        self.llm = DeepSeek()
-
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
 
     def test_init_default(self):
         """Test initialization with default parameters."""
-        # Check that OpenAI client was initialized correctly
-        self.mock_openai.OpenAI.assert_called_once_with(
-            api_key=None,
-            base_url="https://api.deepseek.com"
-        )
-        
-        # Check default model
-        self.assertEqual(self.llm.model, "deepseek-reasoner")
+        # Clear environment variables temporarily
+        with patch.dict('os.environ', {}, clear=True):
+            llm = DeepSeek()
+            # Check that OpenAI client was initialized correctly
+            self.mock_openai.OpenAI.assert_called_once_with(
+                api_key=None,
+                base_url="https://api.deepseek.com"
+            )
+            
+            # Check default model
+            self.assertEqual(llm.model, "deepseek-reasoner")
 
     def test_init_with_api_key_from_env(self):
         """Test initialization with API key from environment variable."""
         api_key = "test_api_key_from_env"
-        with patch.dict(os.environ, {"DEEPSEEK_API_KEY": api_key}):
+        base_url = "https://custom.deepseek.api"
+        with patch.dict(os.environ, {
+            "DEEPSEEK_API_KEY": api_key,
+            "DEEPSEEK_BASE_URL": base_url
+        }):
             llm = DeepSeek()
             self.mock_openai.OpenAI.assert_called_with(
                 api_key=api_key,
-                base_url="https://api.deepseek.com"
+                base_url=base_url
             )
 
     def test_init_with_api_key_parameter(self):
         """Test initialization with API key as parameter."""
         api_key = "test_api_key_param"
-        llm = DeepSeek(api_key=api_key)
-        self.mock_openai.OpenAI.assert_called_with(
-            api_key=api_key,
-            base_url="https://api.deepseek.com"
-        )
+        with patch.dict('os.environ', {}, clear=True):
+            llm = DeepSeek(api_key=api_key)
+            self.mock_openai.OpenAI.assert_called_with(
+                api_key=api_key,
+                base_url="https://api.deepseek.com"
+            )
 
     def test_init_with_custom_model(self):
         """Test initialization with custom model."""
-        model = "deepseek-chat"
-        llm = DeepSeek(model=model)
-        self.assertEqual(llm.model, model)
+        with patch.dict('os.environ', {}, clear=True):
+            model = "deepseek-chat"
+            llm = DeepSeek(model=model)
+            self.assertEqual(llm.model, model)
 
-    def test_init_with_custom_base_url_from_env(self):
-        """Test initialization with base URL from environment variable."""
-        base_url = "https://custom.deepseek.api"
-        with patch.dict(os.environ, {"DEEPSEEK_BASE_URL": base_url}):
-            llm = DeepSeek()
+    def test_init_with_custom_base_url(self):
+        """Test initialization with custom base URL."""
+        # Clear environment variables temporarily
+        with patch.dict('os.environ', {}, clear=True):
+            base_url = "https://custom.deepseek.api"
+            llm = DeepSeek(base_url=base_url)
             self.mock_openai.OpenAI.assert_called_with(
                 api_key=None,
                 base_url=base_url
             )
 
-    def test_init_with_custom_base_url_parameter(self):
-        """Test initialization with base URL as parameter."""
-        base_url = "https://custom.deepseek.api"
-        llm = DeepSeek(base_url=base_url)
-        self.mock_openai.OpenAI.assert_called_with(
-            api_key=None,
-            base_url=base_url
-        )
-
     def test_chat_single_message(self):
         """Test chat with a single message."""
+        # Create DeepSeek instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = DeepSeek()
+            
         messages = [{"role": "user", "content": "Hello"}]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that completions.create was called correctly
         self.mock_completions.create.assert_called_once()
@@ -124,13 +126,17 @@ class TestDeepSeek(unittest.TestCase):
 
     def test_chat_multiple_messages(self):
         """Test chat with multiple messages."""
+        # Create DeepSeek instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = DeepSeek()
+            
         messages = [
             {"role": "system", "content": "You are a helpful assistant"},
             {"role": "user", "content": "Hello"},
             {"role": "assistant", "content": "Hi there!"},
             {"role": "user", "content": "How are you?"}
         ]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that completions.create was called correctly
         self.mock_completions.create.assert_called_once()
@@ -145,12 +151,16 @@ class TestDeepSeek(unittest.TestCase):
 
     def test_chat_with_error(self):
         """Test chat when an error occurs."""
+        # Create DeepSeek instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = DeepSeek()
+            
         # Mock an error response
         self.mock_completions.create.side_effect = Exception("DeepSeek API Error")
 
         messages = [{"role": "user", "content": "Hello"}]
         with self.assertRaises(Exception) as context:
-            self.llm.chat(messages)
+            llm.chat(messages)
 
         self.assertEqual(str(context.exception), "DeepSeek API Error")
 

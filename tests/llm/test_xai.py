@@ -44,23 +44,23 @@ class TestXAI(unittest.TestCase):
         self.module_patcher = patch.dict('sys.modules', {'openai': self.mock_openai})
         self.module_patcher.start()
 
-        # Create instance to test with default model
-        self.llm = XAI()
-
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
 
     def test_init_default(self):
         """Test initialization with default parameters."""
-        # Check that OpenAI client was initialized correctly
-        self.mock_openai.OpenAI.assert_called_once_with(
-            api_key=None,
-            base_url="https://api.x.ai/v1"
-        )
-        
-        # Check default model
-        self.assertEqual(self.llm.model, "grok-2-latest")
+        # Clear environment variables temporarily
+        with patch.dict('os.environ', {}, clear=True):
+            llm = XAI()
+            # Check that OpenAI client was initialized correctly
+            self.mock_openai.OpenAI.assert_called_once_with(
+                api_key=None,
+                base_url="https://api.x.ai/v1"
+            )
+            
+            # Check default model
+            self.assertEqual(llm.model, "grok-2-latest")
 
     def test_init_with_api_key_from_env(self):
         """Test initialization with API key from environment variable."""
@@ -74,32 +74,40 @@ class TestXAI(unittest.TestCase):
 
     def test_init_with_api_key_parameter(self):
         """Test initialization with API key as parameter."""
-        api_key = "test_api_key_param"
-        llm = XAI(api_key=api_key)
-        self.mock_openai.OpenAI.assert_called_with(
-            api_key=api_key,
-            base_url="https://api.x.ai/v1"
-        )
+        with patch.dict('os.environ', {}, clear=True):
+            api_key = "test_api_key_param"
+            llm = XAI(api_key=api_key)
+            self.mock_openai.OpenAI.assert_called_with(
+                api_key=api_key,
+                base_url="https://api.x.ai/v1"
+            )
 
     def test_init_with_custom_model(self):
         """Test initialization with custom model."""
-        model = "grok-1"
-        llm = XAI(model=model)
-        self.assertEqual(llm.model, model)
+        with patch.dict('os.environ', {}, clear=True):
+            model = "grok-1"
+            llm = XAI(model=model)
+            self.assertEqual(llm.model, model)
 
     def test_init_with_custom_base_url(self):
         """Test initialization with custom base URL."""
-        base_url = "https://custom.x.ai"
-        llm = XAI(base_url=base_url)
-        self.mock_openai.OpenAI.assert_called_with(
-            api_key=None,
-            base_url=base_url
-        )
+        # Clear environment variables temporarily
+        with patch.dict('os.environ', {}, clear=True):
+            base_url = "https://custom.x.ai"
+            llm = XAI(base_url=base_url)
+            self.mock_openai.OpenAI.assert_called_with(
+                api_key=None,
+                base_url=base_url
+            )
 
     def test_chat_single_message(self):
         """Test chat with a single message."""
+        # Create XAI instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = XAI()
+            
         messages = [{"role": "user", "content": "Hello"}]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that completions.create was called correctly
         self.mock_completions.create.assert_called_once()
@@ -114,13 +122,17 @@ class TestXAI(unittest.TestCase):
 
     def test_chat_multiple_messages(self):
         """Test chat with multiple messages."""
+        # Create XAI instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = XAI()
+            
         messages = [
             {"role": "system", "content": "You are a helpful assistant"},
             {"role": "user", "content": "Hello"},
             {"role": "assistant", "content": "Hi there!"},
             {"role": "user", "content": "How are you?"}
         ]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that completions.create was called correctly
         self.mock_completions.create.assert_called_once()
@@ -135,14 +147,18 @@ class TestXAI(unittest.TestCase):
 
     def test_chat_with_error(self):
         """Test chat when an error occurs."""
+        # Create XAI instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = XAI()
+            
         # Mock an error response
-        self.mock_completions.create.side_effect = Exception("X.AI API Error")
+        self.mock_completions.create.side_effect = Exception("XAI API Error")
 
         messages = [{"role": "user", "content": "Hello"}]
         with self.assertRaises(Exception) as context:
-            self.llm.chat(messages)
+            llm.chat(messages)
 
-        self.assertEqual(str(context.exception), "X.AI API Error")
+        self.assertEqual(str(context.exception), "XAI API Error")
 
 
 if __name__ == "__main__":

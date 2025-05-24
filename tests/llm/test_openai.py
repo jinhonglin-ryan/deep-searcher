@@ -44,23 +44,23 @@ class TestOpenAI(unittest.TestCase):
         self.module_patcher = patch.dict('sys.modules', {'openai': self.mock_openai})
         self.module_patcher.start()
 
-        # Create instance to test with default model
-        self.llm = OpenAI()
-
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
 
     def test_init_default(self):
         """Test initialization with default parameters."""
-        # Check that OpenAI client was initialized correctly
-        self.mock_openai.OpenAI.assert_called_once_with(
-            api_key=None,
-            base_url=None
-        )
-        
-        # Check default model
-        self.assertEqual(self.llm.model, "o1-mini")
+        # Clear environment variables temporarily
+        with patch.dict('os.environ', {}, clear=True):
+            llm = OpenAI()
+            # Check that OpenAI client was initialized correctly
+            self.mock_openai.OpenAI.assert_called_once_with(
+                api_key=None,
+                base_url=None
+            )
+            
+            # Check default model
+            self.assertEqual(llm.model, "o1-mini")
 
     def test_init_with_api_key_from_env(self):
         """Test initialization with API key from environment variable."""
@@ -93,17 +93,23 @@ class TestOpenAI(unittest.TestCase):
 
     def test_init_with_custom_base_url(self):
         """Test initialization with custom base URL."""
-        base_url = "https://custom.openai.api"
-        llm = OpenAI(base_url=base_url)
-        self.mock_openai.OpenAI.assert_called_with(
-            api_key=None,
-            base_url=base_url
-        )
+        # Clear environment variables temporarily
+        with patch.dict('os.environ', {}, clear=True):
+            base_url = "https://custom.openai.api"
+            llm = OpenAI(base_url=base_url)
+            self.mock_openai.OpenAI.assert_called_with(
+                api_key=None,
+                base_url=base_url
+            )
 
     def test_chat_single_message(self):
         """Test chat with a single message."""
+        # Create OpenAI instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = OpenAI()
+            
         messages = [{"role": "user", "content": "Hello"}]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that completions.create was called correctly
         self.mock_completions.create.assert_called_once()
@@ -118,13 +124,17 @@ class TestOpenAI(unittest.TestCase):
 
     def test_chat_multiple_messages(self):
         """Test chat with multiple messages."""
+        # Create OpenAI instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = OpenAI()
+            
         messages = [
             {"role": "system", "content": "You are a helpful assistant"},
             {"role": "user", "content": "Hello"},
             {"role": "assistant", "content": "Hi there!"},
             {"role": "user", "content": "How are you?"}
         ]
-        response = self.llm.chat(messages)
+        response = llm.chat(messages)
 
         # Check that completions.create was called correctly
         self.mock_completions.create.assert_called_once()
@@ -139,12 +149,16 @@ class TestOpenAI(unittest.TestCase):
 
     def test_chat_with_error(self):
         """Test chat when an error occurs."""
+        # Create OpenAI instance with mocked environment
+        with patch.dict('os.environ', {}, clear=True):
+            llm = OpenAI()
+            
         # Mock an error response
         self.mock_completions.create.side_effect = Exception("OpenAI API Error")
 
         messages = [{"role": "user", "content": "Hello"}]
         with self.assertRaises(Exception) as context:
-            self.llm.chat(messages)
+            llm.chat(messages)
 
         self.assertEqual(str(context.exception), "OpenAI API Error")
 

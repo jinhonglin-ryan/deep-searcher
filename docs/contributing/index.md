@@ -111,10 +111,10 @@ Before submitting your pull request, make sure to run the test suite to ensure y
 First, ensure you have pytest installed. If you haven't installed the development dependencies yet, you can do so with:
 
 ```shell
-uv sync --dev
+uv sync --all-extras --dev
 ```
 
-This will install all development dependencies including pytest and other testing tools.
+This will install all development dependencies and optional dependencies including pytest and other testing tools.
 
 ### Running the Tests
 
