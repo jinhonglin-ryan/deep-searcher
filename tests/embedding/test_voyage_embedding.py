@@ -25,28 +25,25 @@ class TestVoyageEmbedding(unittest.TestCase):
         # Create the module patcher
         self.module_patcher = patch.dict('sys.modules', {'voyageai': self.mock_voyageai})
         self.module_patcher.start()
-        
-        # Set environment variable for API key
-        self.env_patcher = patch.dict('os.environ', {'VOYAGE_API_KEY': 'fake-api-key'})
-        self.env_patcher.start()
-        
-        # Create the embedder
-        self.embedding = VoyageEmbedding()
     
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
-        self.env_patcher.stop()
     
+    @patch.dict('os.environ', {'VOYAGE_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_default(self):
         """Test initialization with default parameters."""
+        # Create the embedder
+        embedding = VoyageEmbedding()
+        
         # Check that voyageai was initialized correctly
         self.mock_voyageai.Client.assert_called_once()
         
         # Check attributes
-        self.assertEqual(self.embedding.model, 'voyage-3')
-        self.assertEqual(self.embedding.voyageai_api_key, 'fake-api-key')
+        self.assertEqual(embedding.model, 'voyage-3')
+        self.assertEqual(embedding.voyageai_api_key, 'fake-api-key')
     
+    @patch.dict('os.environ', {'VOYAGE_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_with_model(self):
         """Test initialization with specified model."""
         # Initialize with a different model
@@ -56,6 +53,7 @@ class TestVoyageEmbedding(unittest.TestCase):
         self.assertEqual(embedding.model, 'voyage-3-lite')
         self.assertEqual(embedding.dimension, 512)  # voyage-3-lite has 512 dimensions
     
+    @patch.dict('os.environ', {'VOYAGE_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_with_model_name(self):
         """Test initialization with model_name parameter."""
         # Initialize with model_name
@@ -64,6 +62,7 @@ class TestVoyageEmbedding(unittest.TestCase):
         # Check attributes
         self.assertEqual(embedding.model, 'voyage-3-large')
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_with_api_key(self):
         """Test initialization with API key parameter."""
         # Initialize with API key
@@ -72,13 +71,17 @@ class TestVoyageEmbedding(unittest.TestCase):
         # Check that the API key was set correctly
         self.assertEqual(embedding.voyageai_api_key, 'test-api-key')
     
+    @patch.dict('os.environ', {'VOYAGE_API_KEY': 'fake-api-key'}, clear=True)
     def test_embed_query(self):
         """Test embedding a single query."""
+        # Create the embedder
+        embedding = VoyageEmbedding()
+        
         # Create a test query
         query = "This is a test query"
         
         # Call the method
-        result = self.embedding.embed_query(query)
+        result = embedding.embed_query(query)
         
         # Verify that embed was called correctly
         self.mock_client.embed.assert_called_once_with(
@@ -90,8 +93,12 @@ class TestVoyageEmbedding(unittest.TestCase):
         # Check the result
         self.assertEqual(result, [0.1] * 1024)
     
+    @patch.dict('os.environ', {'VOYAGE_API_KEY': 'fake-api-key'}, clear=True)
     def test_embed_documents(self):
         """Test embedding multiple documents."""
+        # Create the embedder
+        embedding = VoyageEmbedding()
+        
         # Create test documents
         texts = ["text 1", "text 2", "text 3"]
         
@@ -101,7 +108,7 @@ class TestVoyageEmbedding(unittest.TestCase):
         self.mock_client.embed.return_value = mock_response
         
         # Call the method
-        results = self.embedding.embed_documents(texts)
+        results = embedding.embed_documents(texts)
         
         # Verify that embed was called correctly
         self.mock_client.embed.assert_called_once_with(
@@ -115,10 +122,14 @@ class TestVoyageEmbedding(unittest.TestCase):
         for i, result in enumerate(results):
             self.assertEqual(result, [0.1 * (i + 1)] * 1024)
     
+    @patch.dict('os.environ', {'VOYAGE_API_KEY': 'fake-api-key'}, clear=True)
     def test_dimension_property(self):
         """Test the dimension property."""
+        # Create the embedder
+        embedding = VoyageEmbedding()
+        
         # For voyage-3
-        self.assertEqual(self.embedding.dimension, 1024)
+        self.assertEqual(embedding.dimension, 1024)
         
         # For voyage-3-lite
         embedding = VoyageEmbedding(model='voyage-3-lite')
@@ -127,6 +138,7 @@ class TestVoyageEmbedding(unittest.TestCase):
         # For voyage-3-large
         embedding = VoyageEmbedding(model='voyage-3-large')
         self.assertEqual(embedding.dimension, 1024)
+
 
 if __name__ == "__main__":
     unittest.main() 

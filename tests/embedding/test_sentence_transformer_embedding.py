@@ -33,25 +33,26 @@ class TestSentenceTransformerEmbedding(unittest.TestCase):
         mock_embedding = [[0.1, 0.2, 0.3] * 341 + [0.4]]  # 1024 dimensions
         self.mock_model.encode.return_value = MagicMock()
         self.mock_model.encode.return_value.tolist.return_value = mock_embedding
-        
-        # Create instance to test
-        self.embedding = SentenceTransformerEmbedding(model="BAAI/bge-m3")
     
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init(self):
         """Test initialization."""
+        # Create instance to test
+        embedding = SentenceTransformerEmbedding(model="BAAI/bge-m3")
+        
         # Check that SentenceTransformer was called with the right model
         self.mock_sentence_transformer.assert_called_once_with("BAAI/bge-m3")
         
         # Check that model and client were set correctly
-        self.assertEqual(self.embedding.model, "BAAI/bge-m3")
-        self.assertEqual(self.embedding.client, self.mock_model)
+        self.assertEqual(embedding.model, "BAAI/bge-m3")
+        self.assertEqual(embedding.client, self.mock_model)
         
         # Check batch size default
-        self.assertEqual(self.embedding.batch_size, 32)
+        self.assertEqual(embedding.batch_size, 32)
         
         # Test with model_name parameter
         self.mock_sentence_transformer.reset_mock()
@@ -64,15 +65,19 @@ class TestSentenceTransformerEmbedding(unittest.TestCase):
         embedding = SentenceTransformerEmbedding(batch_size=64)
         self.assertEqual(embedding.batch_size, 64)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_query(self):
         """Test embedding a single query."""
+        # Create instance to test
+        embedding = SentenceTransformerEmbedding(model="BAAI/bge-m3")
+        
         # Mock the encode response for a single query
         single_embedding = [0.1, 0.2, 0.3] * 341 + [0.4]  # 1024 dimensions
         self.mock_model.encode.return_value = MagicMock()
         self.mock_model.encode.return_value.tolist.return_value = [single_embedding]
         
         # Call the method
-        result = self.embedding.embed_query("test query")
+        result = embedding.embed_query("test query")
         
         # Verify encode was called correctly
         self.mock_model.encode.assert_called_once_with("test query")
@@ -81,8 +86,12 @@ class TestSentenceTransformerEmbedding(unittest.TestCase):
         self.assertEqual(len(result), 1024)
         self.assertEqual(result, single_embedding)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_documents_small_batch(self):
         """Test embedding documents with a small batch (less than batch size)."""
+        # Create instance to test
+        embedding = SentenceTransformerEmbedding(model="BAAI/bge-m3")
+        
         # Mock the encode response for documents
         batch_embeddings = [
             [0.1, 0.2, 0.3] * 341 + [0.4],  # 1024 dimensions
@@ -96,7 +105,7 @@ class TestSentenceTransformerEmbedding(unittest.TestCase):
         texts = ["text 1", "text 2", "text 3"]
         
         # Call the method
-        results = self.embedding.embed_documents(texts)
+        results = embedding.embed_documents(texts)
         
         # Verify encode was called correctly
         self.mock_model.encode.assert_called_once_with(texts)
@@ -107,10 +116,11 @@ class TestSentenceTransformerEmbedding(unittest.TestCase):
             self.assertEqual(len(result), 1024)
             self.assertEqual(result, batch_embeddings[i])
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_documents_large_batch(self):
         """Test embedding documents with a large batch (more than batch size)."""
-        # Set a smaller batch size for testing
-        self.embedding.batch_size = 2
+        # Create instance to test with small batch size
+        embedding = SentenceTransformerEmbedding(model="BAAI/bge-m3", batch_size=2)
         
         # Mock the encode response for the first batch
         batch1_embeddings = [
@@ -132,7 +142,7 @@ class TestSentenceTransformerEmbedding(unittest.TestCase):
         texts = ["text 1", "text 2", "text 3"]
         
         # Call the method
-        results = self.embedding.embed_documents(texts)
+        results = embedding.embed_documents(texts)
         
         # Verify encode was called twice with the right batches
         self.assertEqual(self.mock_model.encode.call_count, 2)
@@ -145,26 +155,27 @@ class TestSentenceTransformerEmbedding(unittest.TestCase):
         self.assertEqual(results[1], batch1_embeddings[1])
         self.assertEqual(results[2], batch2_embeddings[0])
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_documents_no_batching(self):
         """Test embedding documents with batching disabled."""
-        # Disable batching
-        self.embedding.batch_size = 0
+        # Create instance to test with batching disabled
+        embedding = SentenceTransformerEmbedding(model="BAAI/bge-m3", batch_size=0)
         
         # Mock the embed_query method
-        original_embed_query = self.embedding.embed_query
+        original_embed_query = embedding.embed_query
         embed_query_calls = []
         
         def mock_embed_query(text):
             embed_query_calls.append(text)
             return [0.1] * 1024  # Return a simple mock embedding
         
-        self.embedding.embed_query = mock_embed_query
+        embedding.embed_query = mock_embed_query
         
         # Create test texts
         texts = ["text 1", "text 2", "text 3"]
         
         # Call the method
-        results = self.embedding.embed_documents(texts)
+        results = embedding.embed_documents(texts)
         
         # Check that embed_query was called for each text
         self.assertEqual(len(embed_query_calls), 3)
@@ -177,12 +188,16 @@ class TestSentenceTransformerEmbedding(unittest.TestCase):
             self.assertEqual(result, [0.1] * 1024)
         
         # Restore original method
-        self.embedding.embed_query = original_embed_query
+        embedding.embed_query = original_embed_query
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_dimension_property(self):
         """Test the dimension property."""
+        # Create instance to test
+        embedding = SentenceTransformerEmbedding(model="BAAI/bge-m3")
+        
         # Check dimension for BAAI/bge-m3
-        self.assertEqual(self.embedding.dimension, 1024)
+        self.assertEqual(embedding.dimension, 1024)
         
         # Test with different models
         self.mock_sentence_transformer.reset_mock()

@@ -41,6 +41,7 @@ class TestMilvusEmbedding(unittest.TestCase):
         """Clean up test fixtures."""
         self.module_patcher.stop()
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_default(self):
         """Test initialization with default parameters."""
         embedding = MilvusEmbedding()
@@ -49,6 +50,7 @@ class TestMilvusEmbedding(unittest.TestCase):
         self.mock_model.DefaultEmbeddingFunction.assert_called_once()
         self.assertEqual(embedding.model, self.mock_default_embedding)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_with_jina_model(self):
         """Test initialization with Jina model."""
         embedding = MilvusEmbedding(model='jina-embeddings-v3')
@@ -57,6 +59,7 @@ class TestMilvusEmbedding(unittest.TestCase):
         self.mock_model.dense.JinaEmbeddingFunction.assert_called_once_with('jina-embeddings-v3')
         self.assertEqual(embedding.model, self.mock_jina_embedding)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_with_bge_model(self):
         """Test initialization with BGE model."""
         embedding = MilvusEmbedding(model='BAAI/bge-large-en-v1.5')
@@ -65,11 +68,13 @@ class TestMilvusEmbedding(unittest.TestCase):
         self.mock_model.dense.SentenceTransformerEmbeddingFunction.assert_called_once_with('BAAI/bge-large-en-v1.5')
         self.assertEqual(embedding.model, self.mock_sentence_transformer)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_with_invalid_model(self):
         """Test initialization with invalid model raises error."""
         with self.assertRaises(ValueError):
             MilvusEmbedding(model='invalid-model')
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_query(self):
         """Test embedding a single query."""
         embedding = MilvusEmbedding()
@@ -84,6 +89,7 @@ class TestMilvusEmbedding(unittest.TestCase):
         expected = [0.1] * 768
         np.testing.assert_array_almost_equal(result, expected)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_documents(self):
         """Test embedding multiple documents."""
         embedding = MilvusEmbedding()
@@ -104,6 +110,7 @@ class TestMilvusEmbedding(unittest.TestCase):
             expected = [0.1 * (i + 1)] * 768
             np.testing.assert_array_almost_equal(result, expected)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_dimension_property(self):
         """Test the dimension property."""
         # For default model

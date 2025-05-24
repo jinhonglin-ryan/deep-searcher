@@ -24,20 +24,20 @@ class ConcreteEmbedding(BaseEmbedding):
 class TestBaseEmbedding(unittest.TestCase):
     """Tests for the BaseEmbedding base class."""
     
-    def setUp(self):
-        """Set up test fixtures."""
-        self.embedding = ConcreteEmbedding()
-    
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_query(self):
         """Test the embed_query method."""
-        result = self.embedding.embed_query("test text")
+        embedding = ConcreteEmbedding()
+        result = embedding.embed_query("test text")
         self.assertEqual(len(result), 768)
         self.assertEqual(result, [0.1] * 768)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_documents(self):
         """Test the embed_documents method."""
+        embedding = ConcreteEmbedding()
         texts = ["text 1", "text 2", "text 3"]
-        results = self.embedding.embed_documents(texts)
+        results = embedding.embed_documents(texts)
         
         # Check we got the right number of embeddings
         self.assertEqual(len(results), 3)
@@ -48,8 +48,11 @@ class TestBaseEmbedding(unittest.TestCase):
             self.assertEqual(result, [0.1] * 768)
     
     @patch('deepsearcher.embedding.base.tqdm')
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_chunks(self, mock_tqdm):
         """Test the embed_chunks method."""
+        embedding = ConcreteEmbedding()
+        
         # Set up mock tqdm to just return the iterable
         mock_tqdm.return_value = lambda x, desc: x
         
@@ -61,20 +64,20 @@ class TestBaseEmbedding(unittest.TestCase):
         ]
         
         # Create a spy on embed_documents
-        original_embed_documents = self.embedding.embed_documents
+        original_embed_documents = embedding.embed_documents
         embed_documents_calls = []
         
         def mock_embed_documents(texts):
             embed_documents_calls.append(texts)
             return original_embed_documents(texts)
         
-        self.embedding.embed_documents = mock_embed_documents
+        embedding.embed_documents = mock_embed_documents
         
         # Mock tqdm to return the batch_texts directly
         mock_tqdm.side_effect = lambda x, **kwargs: x
         
         # Call the method
-        result_chunks = self.embedding.embed_chunks(chunks, batch_size=2)
+        result_chunks = embedding.embed_chunks(chunks, batch_size=2)
         
         # Verify embed_documents was called correctly
         self.assertEqual(len(embed_documents_calls), 2)  # Should be called twice with batch_size=2
@@ -87,9 +90,11 @@ class TestBaseEmbedding(unittest.TestCase):
             self.assertEqual(len(chunk.embedding), 768)
             self.assertEqual(chunk.embedding, [0.1] * 768)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_dimension_property(self):
         """Test the dimension property."""
-        self.assertEqual(self.embedding.dimension, 768)
+        embedding = ConcreteEmbedding()
+        self.assertEqual(embedding.dimension, 768)
         
         # Test with different dimension
         embedding = ConcreteEmbedding(dimension=1024)

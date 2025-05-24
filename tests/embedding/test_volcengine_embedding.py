@@ -24,26 +24,23 @@ class TestVolcengineEmbedding(unittest.TestCase):
         }
         self.mock_response.raise_for_status = MagicMock()
         self.mock_request.return_value = self.mock_response
-        
-        # Set environment variable for API key
-        self.env_patcher = patch.dict('os.environ', {'VOLCENGINE_API_KEY': 'fake-api-key'})
-        self.env_patcher.start()
-        
-        # Create the embedder
-        self.embedding = VolcengineEmbedding()
     
     def tearDown(self):
         """Clean up test fixtures."""
         self.requests_patcher.stop()
-        self.env_patcher.stop()
     
+    @patch.dict('os.environ', {'VOLCENGINE_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_default(self):
         """Test initialization with default parameters."""
+        # Create the embedder
+        embedding = VolcengineEmbedding()
+        
         # Check attributes
-        self.assertEqual(self.embedding.model, 'doubao-embedding-large-text-240915')
-        self.assertEqual(self.embedding.api_key, 'fake-api-key')
-        self.assertEqual(self.embedding.batch_size, 256)
+        self.assertEqual(embedding.model, 'doubao-embedding-large-text-240915')
+        self.assertEqual(embedding.api_key, 'fake-api-key')
+        self.assertEqual(embedding.batch_size, 256)
     
+    @patch.dict('os.environ', {'VOLCENGINE_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_with_model(self):
         """Test initialization with specified model."""
         # Initialize with a different model
@@ -53,6 +50,7 @@ class TestVolcengineEmbedding(unittest.TestCase):
         self.assertEqual(embedding.model, 'doubao-embedding-text-240515')
         self.assertEqual(embedding.dimension, 2048)
     
+    @patch.dict('os.environ', {'VOLCENGINE_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_with_model_name(self):
         """Test initialization with model_name parameter."""
         # Initialize with model_name
@@ -61,6 +59,7 @@ class TestVolcengineEmbedding(unittest.TestCase):
         # Check attributes
         self.assertEqual(embedding.model, 'doubao-embedding-text-240715')
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_with_api_key(self):
         """Test initialization with API key parameter."""
         # Initialize with API key
@@ -69,20 +68,23 @@ class TestVolcengineEmbedding(unittest.TestCase):
         # Check that the API key was set correctly
         self.assertEqual(embedding.api_key, 'test-api-key')
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_without_api_key(self):
         """Test initialization without API key raises error."""
-        # Remove API key from environment
-        with patch.dict('os.environ', {}, clear=True):
-            with self.assertRaises(RuntimeError):
-                VolcengineEmbedding()
+        with self.assertRaises(RuntimeError):
+            VolcengineEmbedding()
     
+    @patch.dict('os.environ', {'VOLCENGINE_API_KEY': 'fake-api-key'}, clear=True)
     def test_embed_query(self):
         """Test embedding a single query."""
+        # Create the embedder
+        embedding = VolcengineEmbedding()
+        
         # Create a test query
         query = "This is a test query"
         
         # Call the method
-        result = self.embedding.embed_query(query)
+        result = embedding.embed_query(query)
         
         # Verify that request was called correctly
         self.mock_request.assert_called_once_with(
@@ -102,8 +104,12 @@ class TestVolcengineEmbedding(unittest.TestCase):
         # Check the result
         self.assertEqual(result, [0.1] * 4096)
     
+    @patch.dict('os.environ', {'VOLCENGINE_API_KEY': 'fake-api-key'}, clear=True)
     def test_embed_documents(self):
         """Test embedding multiple documents."""
+        # Create the embedder
+        embedding = VolcengineEmbedding()
+        
         # Create test documents
         texts = ["text 1", "text 2", "text 3"]
         
@@ -116,7 +122,7 @@ class TestVolcengineEmbedding(unittest.TestCase):
         }
         
         # Call the method
-        results = self.embedding.embed_documents(texts)
+        results = embedding.embed_documents(texts)
         
         # Verify that request was called correctly
         self.mock_request.assert_called_once_with(
@@ -138,8 +144,12 @@ class TestVolcengineEmbedding(unittest.TestCase):
         for i, result in enumerate(results):
             self.assertEqual(result, [0.1 * (i + 1)] * 4096)
     
+    @patch.dict('os.environ', {'VOLCENGINE_API_KEY': 'fake-api-key'}, clear=True)
     def test_embed_documents_with_batching(self):
         """Test embedding documents with batching."""
+        # Create the embedder
+        embedding = VolcengineEmbedding()
+        
         # Create test documents
         texts = ["text " + str(i) for i in range(300)]  # More than batch_size
         
@@ -159,7 +169,7 @@ class TestVolcengineEmbedding(unittest.TestCase):
         self.mock_request.side_effect = mock_batch_response
         
         # Call the method
-        results = self.embedding.embed_documents(texts)
+        results = embedding.embed_documents(texts)
         
         # Check that request was called multiple times
         self.assertTrue(self.mock_request.call_count > 1)
@@ -169,10 +179,14 @@ class TestVolcengineEmbedding(unittest.TestCase):
         for result in results:
             self.assertEqual(result, [0.1] * 4096)
     
+    @patch.dict('os.environ', {'VOLCENGINE_API_KEY': 'fake-api-key'}, clear=True)
     def test_dimension_property(self):
         """Test the dimension property."""
+        # Create the embedder
+        embedding = VolcengineEmbedding()
+        
         # For doubao-embedding-large-text-240915
-        self.assertEqual(self.embedding.dimension, 4096)
+        self.assertEqual(embedding.dimension, 4096)
         
         # For doubao-embedding-text-240715
         embedding = VolcengineEmbedding(model='doubao-embedding-text-240715')
@@ -180,7 +194,8 @@ class TestVolcengineEmbedding(unittest.TestCase):
         
         # For doubao-embedding-text-240515
         embedding = VolcengineEmbedding(model='doubao-embedding-text-240515')
-        self.assertEqual(embedding.dimension, 2048) 
+        self.assertEqual(embedding.dimension, 2048)
+
 
 if __name__ == "__main__":
     unittest.main() 

@@ -44,37 +44,39 @@ class TestGeminiEmbedding(unittest.TestCase):
             MagicMock(values=[0.1] * 768)  # Default embedding for text-embedding-004
         ]
         self.mock_client.models.embed_content.return_value = self.mock_response
-        
-        # Create instance to test
-        self.embedding = GeminiEmbedding()
     
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_default(self):
         """Test initialization with default parameters."""
+        # Create instance to test
+        embedding = GeminiEmbedding()
+        
         # Check that Client was initialized correctly
         self.mock_genai.Client.assert_called_once_with(api_key=None)
         
         # Check default model and dimension
-        self.assertEqual(self.embedding.model, "text-embedding-004")
-        self.assertEqual(self.embedding.dim, 768)
-        self.assertEqual(self.embedding.dimension, 768)
+        self.assertEqual(embedding.model, "text-embedding-004")
+        self.assertEqual(embedding.dim, 768)
+        self.assertEqual(embedding.dimension, 768)
     
+    @patch.dict('os.environ', {'GEMINI_API_KEY': 'test_api_key_from_env'}, clear=True)
     def test_init_with_api_key_from_env(self):
         """Test initialization with API key from environment variable."""
-        api_key = "test_api_key_from_env"
-        with patch.dict(os.environ, {"GEMINI_API_KEY": api_key}):
-            embedding = GeminiEmbedding()
-            self.mock_genai.Client.assert_called_with(api_key=api_key)
+        embedding = GeminiEmbedding()
+        self.mock_genai.Client.assert_called_with(api_key='test_api_key_from_env')
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_with_api_key_parameter(self):
         """Test initialization with API key as parameter."""
         api_key = "test_api_key_param"
         embedding = GeminiEmbedding(api_key=api_key)
         self.mock_genai.Client.assert_called_with(api_key=api_key)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_with_custom_model(self):
         """Test initialization with custom model."""
         model = "gemini-embedding-exp-03-07"
@@ -84,6 +86,7 @@ class TestGeminiEmbedding(unittest.TestCase):
         self.assertEqual(embedding.dim, GEMINI_MODEL_DIM_MAP[model])
         self.assertEqual(embedding.dimension, 3072)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_with_custom_dimension(self):
         """Test initialization with custom dimension."""
         custom_dim = 1024
@@ -92,10 +95,14 @@ class TestGeminiEmbedding(unittest.TestCase):
         self.assertEqual(embedding.dim, custom_dim)
         self.assertEqual(embedding.dimension, custom_dim)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_query_single_char(self):
         """Test embedding a single character query."""
+        # Create instance to test
+        embedding = GeminiEmbedding()
+        
         query = "a"
-        result = self.embedding.embed_query(query)
+        result = embedding.embed_query(query)
         
         # Check that embed_content was called correctly
         self.mock_client.models.embed_content.assert_called_once()
@@ -109,10 +116,14 @@ class TestGeminiEmbedding(unittest.TestCase):
         self.assertEqual(len(result), 768)
         self.assertEqual(result, [0.1] * 768)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_query_multi_char(self):
         """Test embedding a multi-character query."""
+        # Create instance to test
+        embedding = GeminiEmbedding()
+        
         query = "test query"
-        result = self.embedding.embed_query(query)
+        result = embedding.embed_query(query)
         
         # Check that embed_content was called correctly
         self.mock_client.models.embed_content.assert_called_once()
@@ -126,8 +137,12 @@ class TestGeminiEmbedding(unittest.TestCase):
         self.assertEqual(len(result), 768)
         self.assertEqual(result, [0.1] * 768)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_documents(self):
         """Test embedding multiple documents."""
+        # Create instance to test
+        embedding = GeminiEmbedding()
+        
         # Set up mock response for multiple documents
         mock_embeddings = [
             MagicMock(values=[0.1] * 768),
@@ -137,7 +152,7 @@ class TestGeminiEmbedding(unittest.TestCase):
         self.mock_response.embeddings = mock_embeddings
         
         texts = ["text 1", "text 2", "text 3"]
-        results = self.embedding.embed_documents(texts)
+        results = embedding.embed_documents(texts)
         
         # Check that embed_content was called correctly
         self.mock_client.models.embed_content.assert_called_once()
@@ -156,8 +171,12 @@ class TestGeminiEmbedding(unittest.TestCase):
             self.assertEqual(len(result), 768)
             self.assertEqual(result, expected_results[i])
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_chunks(self):
         """Test embedding chunks with batch processing."""
+        # Create instance to test
+        embedding = GeminiEmbedding()
+        
         # Set up mock response for batched documents
         batch1_embeddings = [MagicMock(values=[0.1] * 768)] * 100
         batch2_embeddings = [MagicMock(values=[0.2] * 768)] * 50
@@ -175,7 +194,7 @@ class TestGeminiEmbedding(unittest.TestCase):
                 self.embedding = None
         
         chunks = [MockChunk(f"text {i}") for i in range(150)]
-        results = self.embedding.embed_chunks(chunks, batch_size=100)
+        results = embedding.embed_chunks(chunks, batch_size=100)
         
         # Check that embed_content was called twice (150 chunks split into 2 batches)
         self.assertEqual(self.mock_client.models.embed_content.call_count, 2)
@@ -192,10 +211,14 @@ class TestGeminiEmbedding(unittest.TestCase):
             else:
                 self.assertEqual(chunk.embedding, [0.2] * 768)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_dimension_property_different_models(self):
         """Test the dimension property for different models."""
+        # Create instance to test
+        embedding = GeminiEmbedding()
+        
         # Test default model
-        self.assertEqual(self.embedding.dimension, 768)
+        self.assertEqual(embedding.dimension, 768)
         
         # Test experimental model
         embedding_exp = GeminiEmbedding(model="gemini-embedding-exp-03-07")
@@ -205,19 +228,27 @@ class TestGeminiEmbedding(unittest.TestCase):
         embedding_custom = GeminiEmbedding(dimension=512)
         self.assertEqual(embedding_custom.dimension, 512)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_get_dim_method(self):
         """Test the private _get_dim method."""
+        # Create instance to test
+        embedding = GeminiEmbedding()
+        
         # Test default dimension
-        self.assertEqual(self.embedding._get_dim(), 768)
+        self.assertEqual(embedding._get_dim(), 768)
         
         # Test custom dimension
         embedding_custom = GeminiEmbedding(dimension=1024)
         self.assertEqual(embedding_custom._get_dim(), 1024)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_content_method(self):
         """Test the private _embed_content method."""
+        # Create instance to test
+        embedding = GeminiEmbedding()
+        
         texts = ["test text 1", "test text 2"]
-        result = self.embedding._embed_content(texts)
+        result = embedding._embed_content(texts)
         
         # Check that embed_content was called with correct parameters
         self.mock_client.models.embed_content.assert_called_once()

@@ -36,16 +36,17 @@ class TestBedrockEmbedding(unittest.TestCase):
         }
         self.mock_response["body"].read.return_value = json.dumps({"embedding": [0.1] * 1024})
         self.mock_client.invoke_model.return_value = self.mock_response
-        
-        # Create instance to test with default model
-        self.embedding = BedrockEmbedding()
     
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_default(self):
         """Test initialization with default parameters."""
+        # Create instance to test
+        embedding = BedrockEmbedding()
+        
         # Check that boto3 client was created correctly
         self.mock_boto3.client.assert_called_once_with(
             "bedrock-runtime",
@@ -55,25 +56,26 @@ class TestBedrockEmbedding(unittest.TestCase):
         )
         
         # Check default model
-        self.assertEqual(self.embedding.model, MODEL_ID_TITAN_TEXT_V2)
+        self.assertEqual(embedding.model, MODEL_ID_TITAN_TEXT_V2)
         
         # Ensure no coroutine warnings
         self.mock_client.invoke_model.return_value = self.mock_response
     
+    @patch.dict('os.environ', {
+        'AWS_ACCESS_KEY_ID': 'test_key',
+        'AWS_SECRET_ACCESS_KEY': 'test_secret'
+    }, clear=True)
     def test_init_with_credentials(self):
         """Test initialization with AWS credentials."""
-        with patch.dict("os.environ", {
-            "AWS_ACCESS_KEY_ID": "test_key",
-            "AWS_SECRET_ACCESS_KEY": "test_secret"
-        }):
-            embedding = BedrockEmbedding()
-            self.mock_boto3.client.assert_called_with(
-                "bedrock-runtime",
-                region_name="us-east-1",
-                aws_access_key_id="test_key",
-                aws_secret_access_key="test_secret"
-            )
+        embedding = BedrockEmbedding()
+        self.mock_boto3.client.assert_called_with(
+            "bedrock-runtime",
+            region_name="us-east-1",
+            aws_access_key_id="test_key",
+            aws_secret_access_key="test_secret"
+        )
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_with_different_models(self):
         """Test initialization with different models."""
         # Test Titan Text G1
@@ -84,10 +86,14 @@ class TestBedrockEmbedding(unittest.TestCase):
         embedding = BedrockEmbedding(model=MODEL_ID_COHERE_ENGLISH_V3)
         self.assertEqual(embedding.model, MODEL_ID_COHERE_ENGLISH_V3)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_query(self):
         """Test embedding a single query."""
+        # Create instance to test
+        embedding = BedrockEmbedding()
+        
         query = "test query"
-        result = self.embedding.embed_query(query)
+        result = embedding.embed_query(query)
         
         # Check that invoke_model was called correctly
         self.mock_client.invoke_model.assert_called_once_with(
@@ -99,10 +105,14 @@ class TestBedrockEmbedding(unittest.TestCase):
         self.assertEqual(len(result), 1024)
         self.assertEqual(result, [0.1] * 1024)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_documents(self):
         """Test embedding multiple documents."""
+        # Create instance to test
+        embedding = BedrockEmbedding()
+        
         texts = ["text 1", "text 2", "text 3"]
-        results = self.embedding.embed_documents(texts)
+        results = embedding.embed_documents(texts)
         
         # Check that invoke_model was called for each text
         self.assertEqual(self.mock_client.invoke_model.call_count, 3)
@@ -118,10 +128,12 @@ class TestBedrockEmbedding(unittest.TestCase):
             self.assertEqual(len(result), 1024)
             self.assertEqual(result, [0.1] * 1024)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_dimension_property(self):
         """Test the dimension property for different models."""
-        # Test Titan Text V2
-        self.assertEqual(self.embedding.dimension, 1024)
+        # Create instance to test with Titan Text V2
+        embedding = BedrockEmbedding()
+        self.assertEqual(embedding.dimension, 1024)
         
         # Test Titan Text G1
         embedding = BedrockEmbedding(model=MODEL_ID_TITAN_TEXT_G1)

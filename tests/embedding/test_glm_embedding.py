@@ -29,21 +29,17 @@ class TestGLMEmbedding(unittest.TestCase):
         # Create the module patcher
         self.module_patcher = patch.dict('sys.modules', {'zhipuai': self.mock_zhipuai})
         self.module_patcher.start()
-        
-        # Set environment variable for API key
-        self.env_patcher = patch.dict('os.environ', {'GLM_API_KEY': 'fake-api-key'})
-        self.env_patcher.start()
-        
-        # Create the embedder
-        self.embedding = GLMEmbedding()
     
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
-        self.env_patcher.stop()
     
+    @patch.dict('os.environ', {'GLM_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_default(self):
         """Test initialization with default parameters."""
+        # Create the embedder
+        embedding = GLMEmbedding()
+        
         # Check that ZhipuAI was initialized correctly
         self.mock_zhipuai.ZhipuAI.assert_called_once_with(
             api_key='fake-api-key',
@@ -51,9 +47,10 @@ class TestGLMEmbedding(unittest.TestCase):
         )
         
         # Check attributes
-        self.assertEqual(self.embedding.model, 'embedding-3')
-        self.assertEqual(self.embedding.client, self.mock_client)
+        self.assertEqual(embedding.model, 'embedding-3')
+        self.assertEqual(embedding.client, self.mock_client)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_with_api_key(self):
         """Test initialization with API key parameter."""
         # Initialize with API key
@@ -65,6 +62,7 @@ class TestGLMEmbedding(unittest.TestCase):
             base_url='https://open.bigmodel.cn/api/paas/v4/'
         )
     
+    @patch.dict('os.environ', {'GLM_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_with_base_url(self):
         """Test initialization with base URL parameter."""
         # Initialize with base URL
@@ -76,13 +74,17 @@ class TestGLMEmbedding(unittest.TestCase):
             base_url='https://custom-api.example.com'
         )
     
+    @patch.dict('os.environ', {'GLM_API_KEY': 'fake-api-key'}, clear=True)
     def test_embed_query(self):
         """Test embedding a single query."""
+        # Create the embedder
+        embedding = GLMEmbedding()
+        
         # Create a test query
         query = "This is a test query"
         
         # Call the method
-        result = self.embedding.embed_query(query)
+        result = embedding.embed_query(query)
         
         # Verify that create was called correctly
         self.mock_embeddings.create.assert_called_once_with(
@@ -93,8 +95,12 @@ class TestGLMEmbedding(unittest.TestCase):
         # Check the result
         self.assertEqual(result, [0.1] * 2048)
     
+    @patch.dict('os.environ', {'GLM_API_KEY': 'fake-api-key'}, clear=True)
     def test_embed_documents(self):
         """Test embedding multiple documents."""
+        # Create the embedder
+        embedding = GLMEmbedding()
+        
         # Create test documents
         texts = ["text 1", "text 2", "text 3"]
         
@@ -110,7 +116,7 @@ class TestGLMEmbedding(unittest.TestCase):
         self.mock_embeddings.create.return_value = mock_response
         
         # Call the method
-        results = self.embedding.embed_documents(texts)
+        results = embedding.embed_documents(texts)
         
         # Verify that create was called correctly
         self.mock_embeddings.create.assert_called_once_with(
@@ -123,10 +129,14 @@ class TestGLMEmbedding(unittest.TestCase):
         for i, result in enumerate(results):
             self.assertEqual(result, [0.1 * (i + 1)] * 2048)
     
+    @patch.dict('os.environ', {'GLM_API_KEY': 'fake-api-key'}, clear=True)
     def test_dimension_property(self):
         """Test the dimension property."""
+        # Create the embedder
+        embedding = GLMEmbedding()
+        
         # For embedding-3
-        self.assertEqual(self.embedding.dimension, 2048)
+        self.assertEqual(embedding.dimension, 2048)
 
 
 if __name__ == "__main__":

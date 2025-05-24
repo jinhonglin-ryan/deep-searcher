@@ -27,24 +27,26 @@ class TestFastEmbedEmbedding(unittest.TestCase):
         self.mock_embedding = np.array([0.1] * 384)  # BGE-small has 384 dimensions
         self.mock_text_embedding.query_embed.return_value = iter([self.mock_embedding])
         self.mock_text_embedding.embed.return_value = [self.mock_embedding] * 3
-        
-        # Create instance to test
-        self.embedding = FastEmbedEmbedding()
     
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_default(self):
         """Test initialization with default parameters."""
+        # Create instance to test
+        embedding = FastEmbedEmbedding()
+        
         # Access a method to trigger lazy loading
-        self.embedding.embed_query("test")
+        embedding.embed_query("test")
         
         # Check that TextEmbedding was initialized correctly
         self.mock_fastembed.TextEmbedding.assert_called_once_with(
             model_name="BAAI/bge-small-en-v1.5"
         )
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_with_custom_model(self):
         """Test initialization with custom model."""
         custom_model = "custom/model-name"
@@ -57,6 +59,7 @@ class TestFastEmbedEmbedding(unittest.TestCase):
             model_name=custom_model
         )
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_with_kwargs(self):
         """Test initialization with additional kwargs."""
         kwargs = {"batch_size": 32, "max_length": 512}
@@ -70,10 +73,14 @@ class TestFastEmbedEmbedding(unittest.TestCase):
             **kwargs
         )
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_query(self):
         """Test embedding a single query."""
+        # Create instance to test
+        embedding = FastEmbedEmbedding()
+        
         query = "test query"
-        result = self.embedding.embed_query(query)
+        result = embedding.embed_query(query)
         
         # Check that query_embed was called correctly
         self.mock_text_embedding.query_embed.assert_called_once_with([query])
@@ -82,10 +89,14 @@ class TestFastEmbedEmbedding(unittest.TestCase):
         self.assertEqual(len(result), 384)
         np.testing.assert_array_equal(result, [0.1] * 384)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_documents(self):
         """Test embedding multiple documents."""
+        # Create instance to test
+        embedding = FastEmbedEmbedding()
+        
         texts = ["text 1", "text 2", "text 3"]
-        results = self.embedding.embed_documents(texts)
+        results = embedding.embed_documents(texts)
         
         # Check that embed was called correctly
         self.mock_text_embedding.embed.assert_called_once_with(texts)
@@ -96,18 +107,23 @@ class TestFastEmbedEmbedding(unittest.TestCase):
             self.assertEqual(len(result), 384)
             np.testing.assert_array_equal(result, [0.1] * 384)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_dimension_property(self):
         """Test the dimension property."""
+        # Create instance to test
+        embedding = FastEmbedEmbedding()
+        
         # Mock a sample embedding
         sample_embedding = np.array([0.1] * 384)
         self.mock_text_embedding.query_embed.return_value = iter([sample_embedding])
         
         # Check dimension
-        self.assertEqual(self.embedding.dimension, 384)
+        self.assertEqual(embedding.dimension, 384)
         
         # Verify that query_embed was called with sample text
         self.mock_text_embedding.query_embed.assert_called_with(["SAMPLE TEXT"])
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_lazy_loading(self):
         """Test that the model is loaded lazily."""
         # Create a new instance

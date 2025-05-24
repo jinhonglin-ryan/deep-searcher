@@ -29,29 +29,26 @@ class TestOpenAIEmbedding(unittest.TestCase):
         self.mock_response = MagicMock()
         self.mock_response.data = [mock_data_item]
         self.mock_embeddings.create.return_value = self.mock_response
-        
-        # Set environment variable for API key
-        self.env_patcher = patch.dict('os.environ', {'OPENAI_API_KEY': 'fake-api-key'})
-        self.env_patcher.start()
-        
-        # Create the embedder
-        self.embedding = OpenAIEmbedding()
     
     def tearDown(self):
         """Clean up test fixtures."""
         self.openai_patcher.stop()
-        self.env_patcher.stop()
     
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_default(self):
         """Test initialization with default parameters."""
+        # Create the embedder
+        embedding = OpenAIEmbedding()
+        
         # Check that OpenAI was initialized correctly
         self.mock_openai.assert_called_once_with(api_key='fake-api-key', base_url=None)
         
         # Check attributes
-        self.assertEqual(self.embedding.model, 'text-embedding-ada-002')
-        self.assertEqual(self.embedding.dim, 1536)
-        self.assertFalse(self.embedding.is_azure)
+        self.assertEqual(embedding.model, 'text-embedding-ada-002')
+        self.assertEqual(embedding.dim, 1536)
+        self.assertFalse(embedding.is_azure)
     
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_with_model(self):
         """Test initialization with specified model."""
         # Initialize with a different model
@@ -61,6 +58,7 @@ class TestOpenAIEmbedding(unittest.TestCase):
         self.assertEqual(embedding.model, 'text-embedding-3-large')
         self.assertEqual(embedding.dim, 3072)
     
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_with_model_name(self):
         """Test initialization with model_name parameter."""
         # Initialize with model_name
@@ -69,6 +67,7 @@ class TestOpenAIEmbedding(unittest.TestCase):
         # Check attributes
         self.assertEqual(embedding.model, 'text-embedding-3-small')
     
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_with_dimension(self):
         """Test initialization with specified dimension."""
         # Initialize with custom dimension
@@ -77,6 +76,7 @@ class TestOpenAIEmbedding(unittest.TestCase):
         # Check attributes
         self.assertEqual(embedding.dim, 512)
     
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_with_api_key(self):
         """Test initialization with API key parameter."""
         # Initialize with API key
@@ -85,6 +85,7 @@ class TestOpenAIEmbedding(unittest.TestCase):
         # Check that OpenAI was initialized with the provided API key
         self.mock_openai.assert_called_with(api_key='test-api-key', base_url=None)
     
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_with_base_url(self):
         """Test initialization with base URL parameter."""
         # Initialize with base URL
@@ -94,6 +95,7 @@ class TestOpenAIEmbedding(unittest.TestCase):
         self.mock_openai.assert_called_with(api_key='fake-api-key', base_url='https://test-openai-api.com')
     
     @patch('openai.AzureOpenAI')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_with_azure(self, mock_azure_openai):
         """Test initialization with Azure OpenAI."""
         # Set up mock Azure client
@@ -121,6 +123,7 @@ class TestOpenAIEmbedding(unittest.TestCase):
         self.assertEqual(embedding.deployment, 'text-embedding-ada-002')
     
     @patch('openai.AzureOpenAI')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'fake-api-key'}, clear=True)
     def test_init_with_azure_deployment(self, mock_azure_openai):
         """Test initialization with Azure OpenAI and custom deployment."""
         # Set up mock Azure client
@@ -136,22 +139,30 @@ class TestOpenAIEmbedding(unittest.TestCase):
         # Check attributes
         self.assertEqual(embedding.deployment, 'test-deployment')
     
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'fake-api-key'}, clear=True)
     def test_get_dim(self):
         """Test the _get_dim method."""
+        # Create the embedder
+        embedding = OpenAIEmbedding()
+        
         # For text-embedding-ada-002
-        self.assertIs(self.embedding._get_dim(), NOT_GIVEN)
+        self.assertIs(embedding._get_dim(), NOT_GIVEN)
         
         # For text-embedding-3-small
         embedding = OpenAIEmbedding(model='text-embedding-3-small', dimension=512)
         self.assertEqual(embedding._get_dim(), 512)
     
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'fake-api-key'}, clear=True)
     def test_embed_query(self):
         """Test embedding a single query."""
+        # Create the embedder
+        embedding = OpenAIEmbedding()
+        
         # Create a test query
         query = "This is a test query"
         
         # Call the method
-        result = self.embedding.embed_query(query)
+        result = embedding.embed_query(query)
         
         # Verify that create was called correctly
         self.mock_embeddings.create.assert_called_once_with(
@@ -163,6 +174,7 @@ class TestOpenAIEmbedding(unittest.TestCase):
         # Check the result
         self.assertEqual(result, [0.1] * 1536)
     
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'fake-api-key'}, clear=True)
     def test_embed_query_azure(self):
         """Test embedding a single query with Azure."""
         # Set up Azure embedding
@@ -203,8 +215,12 @@ class TestOpenAIEmbedding(unittest.TestCase):
             # Check the result
             self.assertEqual(result, [0.2] * 1536)
     
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'fake-api-key'}, clear=True)
     def test_embed_documents(self):
         """Test embedding multiple documents."""
+        # Create the embedder
+        embedding = OpenAIEmbedding()
+        
         # Create test documents
         texts = ["text 1", "text 2", "text 3"]
         
@@ -220,7 +236,7 @@ class TestOpenAIEmbedding(unittest.TestCase):
         self.mock_embeddings.create.return_value = mock_response
         
         # Call the method
-        results = self.embedding.embed_documents(texts)
+        results = embedding.embed_documents(texts)
         
         # Verify that create was called correctly
         self.mock_embeddings.create.assert_called_once_with(
@@ -234,10 +250,14 @@ class TestOpenAIEmbedding(unittest.TestCase):
         for i, result in enumerate(results):
             self.assertEqual(result, [0.1 * (i + 1)] * 1536)
     
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'fake-api-key'}, clear=True)
     def test_dimension_property(self):
         """Test the dimension property."""
+        # Create the embedder
+        embedding = OpenAIEmbedding()
+        
         # For text-embedding-ada-002
-        self.assertEqual(self.embedding.dimension, 1536)
+        self.assertEqual(embedding.dimension, 1536)
         
         # For text-embedding-3-small
         embedding = OpenAIEmbedding(model='text-embedding-3-small', dimension=512)

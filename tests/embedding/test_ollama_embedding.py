@@ -27,24 +27,26 @@ class TestOllamaEmbedding(unittest.TestCase):
         
         # Configure mock embed method
         self.mock_client.embed.return_value = {"embeddings": [[0.1] * 1024]}
-        
-        # Create instance to test
-        self.embedding = OllamaEmbedding(model="bge-m3")
     
     def tearDown(self):
         """Clean up test fixtures."""
         self.module_patcher.stop()
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_default(self):
         """Test initialization with default parameters."""
+        # Create instance to test
+        embedding = OllamaEmbedding(model="bge-m3")
+        
         # Check that Client was initialized correctly
         self.mock_ollama_client.assert_called_once_with(host="http://localhost:11434/")
         
         # Check instance attributes
-        self.assertEqual(self.embedding.model, "bge-m3")
-        self.assertEqual(self.embedding.dim, 1024)
-        self.assertEqual(self.embedding.batch_size, 32)
+        self.assertEqual(embedding.model, "bge-m3")
+        self.assertEqual(embedding.dim, 1024)
+        self.assertEqual(embedding.batch_size, 32)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_with_base_url(self):
         """Test initialization with custom base URL."""
         # Reset mock
@@ -56,6 +58,7 @@ class TestOllamaEmbedding(unittest.TestCase):
         # Check that Client was initialized with custom base URL
         self.mock_ollama_client.assert_called_with(host="http://custom-ollama-server:11434/")
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_with_model_name(self):
         """Test initialization with model_name parameter."""
         # Reset mock
@@ -69,6 +72,7 @@ class TestOllamaEmbedding(unittest.TestCase):
         # Check dimension is set correctly based on model
         self.assertEqual(embedding.dim, 768)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_init_with_dimension(self):
         """Test initialization with custom dimension."""
         # Reset mock
@@ -80,13 +84,17 @@ class TestOllamaEmbedding(unittest.TestCase):
         # Check dimension attribute
         self.assertEqual(embedding.dim, 512)
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_query(self):
         """Test embedding a single query."""
+        # Create instance to test
+        embedding = OllamaEmbedding(model="bge-m3")
+        
         # Set up mock response
         self.mock_client.embed.return_value = {"embeddings": [[0.1, 0.2, 0.3] * 341 + [0.4]]}  # 1024 dimensions
         
         # Call the method
-        result = self.embedding.embed_query("test query")
+        result = embedding.embed_query("test query")
         
         # Verify embed was called correctly
         self.mock_client.embed.assert_called_once_with(model="bge-m3", input="test query")
@@ -95,8 +103,12 @@ class TestOllamaEmbedding(unittest.TestCase):
         self.assertEqual(len(result), 1024)
         self.assertEqual(result, [0.1, 0.2, 0.3] * 341 + [0.4])
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_documents_small_batch(self):
         """Test embedding documents with a small batch (less than batch size)."""
+        # Create instance to test
+        embedding = OllamaEmbedding(model="bge-m3")
+        
         # Set up mock response for multiple documents
         mock_embeddings = [
             [0.1, 0.2, 0.3] * 341 + [0.4],  # 1024 dimensions
@@ -109,7 +121,7 @@ class TestOllamaEmbedding(unittest.TestCase):
         texts = ["text 1", "text 2", "text 3"]
         
         # Call the method
-        results = self.embedding.embed_documents(texts)
+        results = embedding.embed_documents(texts)
         
         # Verify embed was called correctly
         self.mock_client.embed.assert_called_once_with(model="bge-m3", input=texts)
@@ -120,10 +132,14 @@ class TestOllamaEmbedding(unittest.TestCase):
             self.assertEqual(len(result), 1024)
             self.assertEqual(result, mock_embeddings[i])
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_documents_large_batch(self):
         """Test embedding documents with a large batch (more than batch size)."""
+        # Create instance to test
+        embedding = OllamaEmbedding(model="bge-m3")
+        
         # Set a smaller batch size for testing
-        self.embedding.batch_size = 2
+        embedding.batch_size = 2
         
         # Set up mock responses for batches
         batch1_embeddings = [
@@ -144,7 +160,7 @@ class TestOllamaEmbedding(unittest.TestCase):
         texts = ["text 1", "text 2", "text 3"]
         
         # Call the method
-        results = self.embedding.embed_documents(texts)
+        results = embedding.embed_documents(texts)
         
         # Verify embed was called twice with the right batches
         self.assertEqual(self.mock_client.embed.call_count, 2)
@@ -157,26 +173,30 @@ class TestOllamaEmbedding(unittest.TestCase):
         self.assertEqual(results[1], batch1_embeddings[1])
         self.assertEqual(results[2], batch2_embeddings[0])
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_embed_documents_no_batching(self):
         """Test embedding documents with batching disabled."""
+        # Create instance to test
+        embedding = OllamaEmbedding(model="bge-m3")
+        
         # Disable batching
-        self.embedding.batch_size = 0
+        embedding.batch_size = 0
         
         # Mock the embed_query method
-        original_embed_query = self.embedding.embed_query
+        original_embed_query = embedding.embed_query
         embed_query_calls = []
         
         def mock_embed_query(text):
             embed_query_calls.append(text)
             return [0.1] * 1024  # Return a simple mock embedding
         
-        self.embedding.embed_query = mock_embed_query
+        embedding.embed_query = mock_embed_query
         
         # Create test texts
         texts = ["text 1", "text 2", "text 3"]
         
         # Call the method
-        results = self.embedding.embed_documents(texts)
+        results = embedding.embed_documents(texts)
         
         # Check that embed_query was called for each text
         self.assertEqual(len(embed_query_calls), 3)
@@ -189,12 +209,16 @@ class TestOllamaEmbedding(unittest.TestCase):
             self.assertEqual(result, [0.1] * 1024)
         
         # Restore original method
-        self.embedding.embed_query = original_embed_query
+        embedding.embed_query = original_embed_query
     
+    @patch.dict('os.environ', {}, clear=True)
     def test_dimension_property(self):
         """Test the dimension property."""
+        # Create instance to test
+        embedding = OllamaEmbedding(model="bge-m3")
+        
         # Check dimension for bge-m3
-        self.assertEqual(self.embedding.dimension, 1024)
+        self.assertEqual(embedding.dimension, 1024)
         
         # Test with different models
         self.mock_ollama_client.reset_mock()

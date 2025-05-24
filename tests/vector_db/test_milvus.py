@@ -10,11 +10,14 @@ from deepsearcher.vector_db.base import RetrievalResult
 class TestMilvus(unittest.TestCase):
     """Simple tests for the Milvus vector database implementation."""
 
+    @patch('pymilvus.connections')
     @patch('pymilvus.MilvusClient')
-    def test_init(self, mock_client_class):
+    def test_init(self, mock_client_class, mock_connections):
         """Test basic initialization."""
         mock_client = MagicMock()
         mock_client_class.return_value = mock_client
+        # Mock the connections.connect to prevent actual connection attempts
+        mock_connections.connect = MagicMock()
         
         milvus = Milvus(
             default_collection="test_collection",
@@ -29,11 +32,14 @@ class TestMilvus(unittest.TestCase):
         self.assertFalse(milvus.hybrid)
         self.assertIsNotNone(milvus.client)
 
+    @patch('pymilvus.connections')
     @patch('pymilvus.MilvusClient')
-    def test_init_collection(self, mock_client_class):
+    def test_init_collection(self, mock_client_class, mock_connections):
         """Test collection initialization."""
         mock_client = MagicMock()
         mock_client_class.return_value = mock_client
+        # Mock the connections.connect to prevent actual connection attempts
+        mock_connections.connect = MagicMock()
         mock_client.has_collection.return_value = False  # Collection doesn't exist
         
         # Mock schema and index creation
@@ -57,11 +63,14 @@ class TestMilvus(unittest.TestCase):
         
         self.assertTrue(test_passed, "init_collection should work")
 
+    @patch('pymilvus.connections')
     @patch('pymilvus.MilvusClient')
-    def test_insert_data_with_retrieval_results(self, mock_client_class):
+    def test_insert_data_with_retrieval_results(self, mock_client_class, mock_connections):
         """Test inserting data using RetrievalResult objects."""
         mock_client = MagicMock()
         mock_client_class.return_value = mock_client
+        # Mock the connections.connect to prevent actual connection attempts
+        mock_connections.connect = MagicMock()
         mock_client.insert.return_value = None
         
         milvus = Milvus()
@@ -96,11 +105,14 @@ class TestMilvus(unittest.TestCase):
         
         self.assertTrue(test_passed, "insert_data should work with RetrievalResult objects")
 
+    @patch('pymilvus.connections')
     @patch('pymilvus.MilvusClient')
-    def test_search_data(self, mock_client_class):
+    def test_search_data(self, mock_client_class, mock_connections):
         """Test search functionality."""
         mock_client = MagicMock()
         mock_client_class.return_value = mock_client
+        # Mock the connections.connect to prevent actual connection attempts
+        mock_connections.connect = MagicMock()
         
         # Mock search results
         d = 8
@@ -152,11 +164,14 @@ class TestMilvus(unittest.TestCase):
             for result in top_2:
                 self.assertIsInstance(result, RetrievalResult)
 
+    @patch('pymilvus.connections')
     @patch('pymilvus.MilvusClient')
-    def test_clear_collection(self, mock_client_class):
+    def test_clear_collection(self, mock_client_class, mock_connections):
         """Test clearing collection."""
         mock_client = MagicMock()
         mock_client_class.return_value = mock_client
+        # Mock the connections.connect to prevent actual connection attempts
+        mock_connections.connect = MagicMock()
         mock_client.drop_collection.return_value = None
         
         milvus = Milvus()
@@ -172,11 +187,14 @@ class TestMilvus(unittest.TestCase):
         
         self.assertTrue(test_passed, "clear_db should work")
 
+    @patch('pymilvus.connections')
     @patch('pymilvus.MilvusClient')
-    def test_list_collections(self, mock_client_class):
+    def test_list_collections(self, mock_client_class, mock_connections):
         """Test listing collections."""
         mock_client = MagicMock()
         mock_client_class.return_value = mock_client
+        # Mock the connections.connect to prevent actual connection attempts
+        mock_connections.connect = MagicMock()
         mock_client.list_collections.return_value = ["hello_deepsearcher", "test_collection"]
         
         # Mock describe_collection for each collection
