@@ -56,6 +56,9 @@ class TestBedrockEmbedding(unittest.TestCase):
         
         # Check default model
         self.assertEqual(self.embedding.model, MODEL_ID_TITAN_TEXT_V2)
+        
+        # Ensure no coroutine warnings
+        self.mock_client.invoke_model.return_value = self.mock_response
     
     def test_init_with_credentials(self):
         """Test initialization with AWS credentials."""

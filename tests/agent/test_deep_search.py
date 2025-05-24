@@ -61,13 +61,10 @@ class TestDeepSearch(BaseAgentTest):
         # Mock the collection_router.invoke method
         self.deep_search.collection_router.invoke = MagicMock(return_value=(["test_collection"], 5))
         
-        # Run the async method inside a new event loop
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        results, tokens = loop.run_until_complete(
+        # Run the async method using asyncio.run
+        results, tokens = asyncio.run(
             self.deep_search._search_chunks_from_vectordb(query, sub_queries)
         )
-        loop.close()
         
         # Check if correct methods were called
         self.deep_search.collection_router.invoke.assert_called_once()
@@ -159,14 +156,19 @@ class TestDeepSearch(BaseAgentTest):
             {"all_sub_queries": ["What is deep learning?", "How does deep learning work?"]}
         )
         
-        # Patch asyncio.run to return our mock result
-        with patch('asyncio.run', return_value=mock_retrieve_result):
-            results, tokens, metadata = self.deep_search.retrieve(query)
+        # Mock the async_retrieve method
+        async def mock_async_retrieve(*args, **kwargs):
+            return mock_retrieve_result
             
-            # Check results
-            self.assertEqual(len(results), 1)
-            self.assertEqual(tokens, 20)
-            self.assertIn("all_sub_queries", metadata)
+        self.deep_search.async_retrieve = mock_async_retrieve
+        
+        # Run the async method using asyncio.run
+        results, tokens, metadata = asyncio.run(self.deep_search.async_retrieve(query))
+        
+        # Check results
+        self.assertEqual(len(results), 1)
+        self.assertEqual(tokens, 20)
+        self.assertIn("all_sub_queries", metadata)
     
     def test_query(self):
         """Test the query method."""

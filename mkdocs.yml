@@ -60,6 +60,8 @@ nav:
       - "Development Mode": installation/development.md
     - "FAQ": 
       - "FAQ": faq/index.md
+  - Contribution Guide:
+    - "Contribution Guide": contributing/index.md
   - Usage:
     - "Usage": usage/index.md
     - "Quick Start": usage/quick_start.md
